@@ -1,0 +1,92 @@
+<html dir="rtl" lang="fa-IR">
+{%  load static %}
+{% load tag_liberary %}
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="/static/TeamFeature/css/bootstrap.css" >
+    <link rel="stylesheet" type="text/css" href="/static/TeamFeature/css/bootstrap.rtl.css" >
+    <link rel="stylesheet" type="text/css" href="/static/TeamFeature/css/jquery-confirm.min.css" >
+    <link rel="stylesheet" type="text/css" href="/static/TeamFeature/css/fontawesome.css" >
+    <link rel="stylesheet" type="text/css" href="/static/TeamFeature/css/solid.css" >
+    <link rel="stylesheet" type="text/css" href="/static/TeamFeature/css/brands.css" >
+    <link rel="stylesheet" type="text/css" href="/static/TeamFeature/css/style_new.css" >
+{#    <link rel="stylesheet" href="/static/TeamFeature/scss/fontawesome.scss">#}
+
+
+
+    <title>وضعیت قابلیتهای تیم ها در شرکت ها</title>
+</head>
+<body>
+
+    <div class="container1  ">
+        <div class="row d-flex justify-content-center  align-content-center select-view">
+             <div class="version-titr">
+
+                    <div class="old-version">
+                       <a href="/TeamFeature/"> <img  atr="old version" title="old version" src="/static/TeamFeature/images/icon/old-version.png"></a>
+                        <p>نسخه قبلی </p>
+                    </div>
+                    <h3> قابلیت های تیم </h3>
+                    <a href="/static/TeamFeature/file/GEN.QUGU.TCFS.EIT.03.pdf" target="_blank">
+                        <img alt="جهت دانلود راهنما کلیک کنید" title="جهت دانلود راهنما کلیک کنید." class="help-new-version" src="/static/TeamFeature/images/icon/help.png"></a>
+
+                </div>
+        <div class="mt-3 mb-5 mx-6 justify-content-between team-info combo col-3">
+                     {% if has_more_than_one_team %}
+                         <form method="post" name="frm_user_team">
+                             {% csrf_token %}
+                             <select name="team_selected" id="team_selected">
+                                 {% for t in obj_team %}
+                                     <option value="{{ t.TeamCode }}" {% if  t.TeamCode == team %}selected{% endif %}>
+                                         {{ t.TeamName }}
+                                     </option>
+                                 {% endfor %}
+                             </select>
+                             <button type="submit" class="hide"></button>
+                         </form>
+                     {% else %}
+                         {% for team in obj_team %}
+                             <span>{{ team.TeamName }}</span>
+                         {% endfor %}
+                     {% endif %}
+            </div>
+                <div class="top_icons" >
+
+
+
+                    <div class="location-top-item">
+                         <div class="top-item {% if view == 'corp' %} select{% endif %}">
+                         <div class="back-top-icon">
+                             <a href="/TeamFeature/corp-view/"><img class='corp-img  ' src="/static/TeamFeature/images/icon/corp-view.png"></a>
+                         </div>
+                        <p>نمایش براساس شرکت ها</p>
+                    </div>
+
+                    <div class="top-item {% if view == 'feature' %} select{% endif %}">
+                          <div class="back-top-icon">
+                                <a href="/TeamFeature/feature-view/"><img class="feature-img " src="/static/TeamFeature/images/icon/feature-view.png"></a>
+                          </div>
+                          <p>نمایش براساس قابلیت ها</p>
+                    </div>
+                    </div>
+
+
+                </div>
+
+            </div>
+        </div>
+
+        {% block main_content%}
+        {% endblock %}
+    </div>
+
+
+
+
+</body>
+<script src="/static/TeamFeature/js/jquery-3.6.0.min.js"></script>
+<script src="/static/TeamFeature/js/jquery-confirm.min.js"></script>
+<script src="/static/TeamFeature/js/fontawesome.min.js"></script>
+<script src="/static/TeamFeature/js/mycode_new.js"></script>
+
+</html>

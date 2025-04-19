@@ -1,0 +1,196 @@
+
+{% extends 'TeamFeature/base.html' %}
+    {% block main_content %}
+        <input type="hidden" id="token" value="{{token}}">
+        <div class=" main-content feature-view">
+                <div class="search-add-feature">
+                       <div class="col-6 general-search-box">
+                     <img class="search-img" src="/static/TeamFeature/images/icon/search.svg">
+                    <input class="search-input" type="text" placeholder="جستجو قابلیت ها....">
+
+                </div>
+                <div class="add-feature">
+                    <i title="ایجاد فیچر جدید" class="fa-solid fa-plus-square fa-3x" aria-hidden="true" data-toggle="modal" data-target="#exampleModal"></i>
+
+                </div>
+                </div>
+
+
+
+                <div class="hide feature-add-form modal new_feature">
+                    <form name="frm-feature-add" method="post">
+                        {% csrf_token %}
+                        <input name="team-code" type="hidden" value="{{ team }}">
+
+                        <div class="star-add-feature">
+                            <img data-val="1" class="new-star active"
+                                 src="/static/TeamFeature/images/icon/star-active.png"/>
+                            <img data-val="2" class="new-star inactive"
+                                 src="/static/TeamFeature/images/icon/star-inactive.png"/>
+                            <img data-val="3" class="new-star inactive"
+                                 src="/static/TeamFeature/images/icon/star-inactive.png"/>
+                            <input class="star-count" name="star-count" type="hidden" value="1">
+
+                        </div>
+                        <br/>
+                        <div class="new-feature-title">
+                            <div><img src="/static/TeamFeature/images/icon/title.png"></div>
+                            <textarea name="feature" cols="50" rows="2" placeholder="عنوان را وارد کنید"></textarea>
+                        </div>
+
+                        <br/>
+                        <img src="/static/TeamFeature/images/icon/calender.png">
+                        <input name="year-number" type="number" value="1400"/>
+                        <img src="/static/TeamFeature/images/icon/sort.png">
+                        <input name="order" type="number" value="1"/>
+                        <br/>
+                        <br/>
+                        <div class="action-icon">
+                            <button class="icon save" type="submit"> ذخیره</button>
+                            {#                            <img src="/static/TeamFeature/images/icon/save.png" alt="جهت ثبت کلیک کنید" title="جهت ثبت کلیک کنید"#}
+                            {#                             class="icon save"/>#}
+                            <button class="cancel" type="submit">انصراف</button>
+                        </div>
+                    </form>
+                </div>
+
+            {% for feature in team_corp_feature_list %}
+            <div class="feature main-row" data-key="{{ feature.feature_code }}">
+
+                <div class=" col-12 title " data-feature-title="{{ feature.title }}">
+                    <div class="little-arrow " href="#">
+                            <i class="fa fa-caret-down rotate fa-1x" aria-hidden="true"></i>
+
+{#                        <span class="up hide">Ù</span> <span class="down">Ú</span>#}
+                    </div>
+                    <div class="star-place col-lg-1 col-sm-2 col-md-2">
+                        <img src="/static/TeamFeature/images/icon/star-active.png" class="star active"
+                             data-key="{{ feature.feature_code }}" data-val="1"
+                             alt="درجه اهمیت متوسط" title="درجه اهمیت متوسط"/>
+                        <img src="/static/TeamFeature/images/icon/star-{% if feature.importance < 2 %}in{% endif %}active.png"
+                             class="star {% if feature.importance < 2 %}in{% endif %}active"
+                             data-key="{{ feature.feature_code }}" data-val="2"
+                             alt="درجه اهمیت زیاد" title="درجه اهمیت زیاد"/>
+                        <img src="/static/TeamFeature/images/icon/star-{% if feature.importance < 3 %}in{% endif %}active.png"
+                             class="star {% if feature.importance < 3 %}in{% endif %}active"
+                             data-key="{{ feature.feature_code }}" data-val="3"
+                             alt="درجه اهمیت خیلی زیاد" title="درجه اهمیت خیلی زیاد"/>
+                    </div>
+                    <div class="col-8 star-title">
+{#                        {{ feature.title }}#}
+
+                         <div class="feature-text-place">
+                            <span data-key="{{ feature.feature_code }}">{{ feature.title }}</span>
+                            <textarea name="{{ feature.feature_code }}" cols="50" rows="2" class="hide feature-text-edit" >{{ feature.title }}</textarea>
+                        </div>
+                    </div>
+                    <div class="col-lg-1 col-sm-2 select-year">
+                        <input class="title-year" type="number" value="{{ feature.year_number }}">
+
+                    </div>
+
+                    <div class="feature-icon-place col-md-1 col-lg-1 col-sm-2">
+                            <div class="feature-icon trash" data-key="{{feature.feature_code}}">
+                                <i  title="delete feature" class=" fa-solid fa-trash-can" ></i>
+                            </div>
+                            <div class="feature-icon edit" data-key="{{feature.feature_code}}">
+                                <i title="edit feature" class="fa-sharp fa-solid fa-pen-to-square"></i>
+                            </div>
+                            <div class="feature-icon cancel-edit hide" data-key="{{feature.feature_code}}">
+                                <i title="cancel edit" class="fa-sharp fa-solid fa-circle-xmark"></i>
+                            </div>
+                            <div class="feature-icon save-edit hide" data-key="{{feature.feature_code}}">
+                                <i title="save edited" class="fa-sharp fa-solid fa-circle-check"></i>
+                            </div>
+                    </div>
+
+
+
+                </div>
+                <div class="situation-box " style="display:none;">
+                    <div class="col-5 panel active">
+                        <div class="col-12 panel-title">
+                            <div class="col-6 status">
+                                <img class="status-icon" src="/static/TeamFeature/images/icon/Active1.png">
+                                فعال
+                            </div>
+                            <div class="col-6 case-count" data-key="{{ feature.active_corp_count }}">{{ feature.active_corp_count }} مورد</div>
+                        </div>
+                        <div class="col-12 panel-search">
+                            <div class="col-6 btn-all">انتخاب همه</div>
+                            <div class="col-6 search-box">
+                                <input class="search-input" type="text" placeholder="جستجو...">
+                                <img class="search-img" src="/static/TeamFeature/images/icon/search.svg">
+                            </div>
+
+
+                        </div>
+                        <div class="col-12 panel-body">
+                            <table class="col-12">
+                                {% for corp in feature.active_corp %}
+                                    <tr data-key="{{ corp.code }}" data-corp-title="{{ corp.title }}">
+                                        <td><input class="select" data-key="{{ corp.code }}" type="checkbox"
+                                                   name="corp_select "></td>
+                                        <td><img class="icon corp " alt="{{ corp.title }}"
+                                                 src="/static/TeamFeature/images/corp/{{ corp.code }}.png"
+                                                 data-key="{{ corp.code }}"></td>
+                                        <td class=" corp-title"> {{ corp.title }}</td>
+                                        <td><input class="active-year" type="number" value="{{ corp.year_number }}"
+                                                   name="active_year" data-key="{{ corp.code }}"></td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-2 operation">
+
+                        <p> غیرفعال سازی </p>
+                        <img src="/static/TeamFeature/images/icon/arrow.png">
+
+
+                    </div>
+                    <div class="col-5 panel inactive">
+                        <div class=" col-12 panel-title ">
+                            <div class="col-6 status">
+                                <img  class="status-icon" src="/static/TeamFeature/images/icon/inactive-icon-8.jpg">
+                                 غیرفعال
+                            </div>
+                            <span class="col-6 case-count" data-key="{{ feature.inactive_corp_count }}">{{ feature.inactive_corp_count }} مورد</span>
+                        </div>
+
+                       <div class="col-12 panel-search">
+                           <div class="col-6 btn-all" >انتخاب همه</div>
+                            <div class="col-6 search-box">
+                                <input class="search-input" type="search" placeholder="جستجو...">
+                                <img class="search-img" src="/static/TeamFeature/images/icon/search.svg">
+
+                            </div>
+
+                       </div>
+                        <div class="panel-body ">
+                            <table class="col-12">
+                                {% for corp in feature.inactive_corp %}
+                                    <tr data-key="{{ corp.code }}" data-corp-title="{{ corp.title }}">
+                                        <td><input class="select " data-key="{{ corp.code }}" type="checkbox"
+                                                   name="corp_select "></td>
+                                        <td><img class="icon corp " alt="{{ corp.title }}"
+                                                 src="/static/TeamFeature/images/corp/{{ corp.code }}.png"></td>
+                                        <td class=" corp-title"> {{ corp.title }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+
+    {% endblock %}
+
+
+
+
+
+

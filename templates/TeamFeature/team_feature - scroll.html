@@ -1,0 +1,141 @@
+<html dir="rtl" lang="fa-IR">
+{% load tag_liberary %}
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="/static/TeamFeature/css/bootstrap.css" >
+    <link rel="stylesheet" type="text/css" href="/static/TeamFeature/css/jquery-confirm.min.css" >
+    <link rel="stylesheet" type="text/css" href="/static/TeamFeature/css/bootstrap.rtl.css" >
+    <link rel="stylesheet" type="text/css" href="/static/TeamFeature/css/fontawesome.min.css" >
+    <link rel="stylesheet" type="text/css" href="/static/TeamFeature/css/style.css" >
+    <title>وضعیت قابلیتهای تیم ها در شرکت ها</title>
+</head>
+<body>
+    <div class="team_feature_page">
+        <div class="team-info">
+            {% for t in obj_team %}
+                <img src="/static/TeamFeature/images/team/{{ t.TeamCode}}.png" alt="{{ t.TeamName }}"
+                     title="{{ t.TeamName }}" class="logo {{ t.TeamCode }} {% if t.TeamCode != team %}hidden{% endif %}">
+            {% endfor %}
+            <br>
+            <div class="mt-3 mb-5 mx-6 justify-content-between team-info combo col-3">
+            {% if has_more_than_one_team %}
+                <form method="post" name="frm_user_team">
+                 {% csrf_token %}
+                    <select name="team_selected" id="team_selected">
+                    {% for t in obj_team %}
+                        <option value="{{ t.TeamCode}}" {% if  t.TeamCode == team %}selected{% endif %}>
+                            {{ t.TeamName }}
+                        </option>
+                    {% endfor %}
+                    </select>
+                    <button type="submit" class="hidden" ></button>
+                </form>
+                {% else %}
+                {% for team in obj_team %}
+                    <span>{{ team.TeamName }}</span>
+                {% endfor %}
+             {% endif %}
+            </div>
+        </div>
+        <div class="content row1">
+            <div class="cols-2 column1">-</div>
+            <div class="col-10 column2">
+                <div class="corp-list">
+                    <table>
+                    <thead>
+                        <tr>
+                            {% for corp in obj_corp %}
+                                <th>
+                                    <img src="/static/TeamFeature/images/corp/{{ corp.CorpCode }}.png"
+                                         alt="{{ corp.CorpName }}"  title="{{ corp.CorpName }}"
+                                         class="corp" data-key="{{ corp.CorpCode }}"/>
+                                </th>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            {% for corp in obj_corp %}
+                                <th>
+                                    <img src="/static/TeamFeature/images/icon/all-feature.png"
+                                         alt="برای فعال کردن تمامی قابلیتها برای این شرکت، کلیک کنید"
+                                         title="برای فعال کردن تمامی قابلیتها برای این شرکت، کلیک کنید" class="icon active all"
+                                         data-corp="{{ corp.CorpCode }}" data-feature="ALL"/>
+                                    <br/>
+                                    <input type="number" min="1380" max="1401" name="{{ corp.CorpCode }}-ALL" class="year-no all"  value="1400"
+                                           data-corp="{{ corp.CorpCode }}" data-feature="ALL"/>
+                                </th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                </table>
+                </div>
+                <div class="team-feature mt-6">
+
+                </div>
+            </div>
+        </div>
+        <div class="content row2">
+            <div class="cols-2 column1">
+                <table>
+                    <tbody>
+                        {%  for obj in team_corp_feature_list %}
+                        <tr data-key="{{ obj.feature.FeatureCode }}">
+                            <td>
+                                <div class="feature-text" data-key="{{ obj.feature.FeatureCode }}" title="{{ obj.feature.Feature }}">
+                                    <span data-key="{{ obj.feature.FeatureCode }}">{{ obj.feature.Feature }}</span>
+                                    <textarea name="{{ obj.feature.FeatureCode }}" cols="15" rows="5" class="hidden feature-text-edit" >{{ obj.feature.Feature }}</textarea>
+                                    <img src="/static/TeamFeature/images/icon/edit.png" alt="جهت ویرایش کلیک کنید" title="جهت ویرایش کلیک کنید"
+                                    class="feature-icon edit" data-key="{{ obj.feature.FeatureCode }}"/>
+                                    <img src="/static/TeamFeature/images/icon/delete.png" alt="جهت حذف کلیک کنید" title="جهت حذف کلیک کنید"
+                                    class="feature-icon delete" data-key="{{ obj.feature.FeatureCode }}"/>
+                                    <img src="/static/TeamFeature/images/icon/save.png" alt="جهت ثبت کلیک کنید" title="جهت ثبت کلیک کنید"
+                                    class="feature-icon save hidden" data-key="{{ obj.feature.FeatureCode }}"/>
+                                    <img src="/static/TeamFeature/images/icon/cancel.png" alt="جهت لغو تغییرات کلیک کنید" title="جهت لغو تغییرات کلیک کنید"
+                                    class="feature-icon cancel hidden" data-key="{{ obj.feature.FeatureCode }}"/>
+                                </div>
+                            </td>
+                            <td>
+                                <img src="/static/TeamFeature/images/icon/all-corp.png"
+                                     alt="برای فعال کردن این قابلیت برای تمامی شرکت ها کلیک کنید"
+                                     title="برای فعال کردن این قابلیت برای تمامی شرکت ها کلیک کنید" class="icon inactive all"
+                                     data-corp="ALL" data-feature="{{ obj.feature.FeatureCode }}"/>
+                                <br/>
+                                <input type="number" min="1380" max="1401" name="{{ obj.feature.FeatureCode }}-ALL" class="year-no all" value="1400"
+                                     data-corp="ALL" data-feature="{{ obj.feature.FeatureCode }}"/>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-10 column2">
+                <div class="team-feature mt-6">
+                    <table>
+                        <tbody>
+                            {%  for obj in team_corp_feature_list %}
+                            <tr data-key="{{ obj.feature.FeatureCode }}">
+                            {% for corp_feature in obj.list %}
+                                <td>
+                                    <img src="/static/TeamFeature/images/icon/{{corp_feature.image_name }}.png" alt="{{ corp_feature.alt }}"
+                                         title="{{ corp_feature.alt }}" class="icon {{corp_feature.image_name  }} "
+                                         data-corp="{{ corp_feature.corp.CorpCode }}" data-feature="{{ obj.feature.FeatureCode }}"/>
+                                    <br/>
+                                    <input type="number" min="1380" max="1401" name="{{ corp_feature.corp.CorpCode }}-{{ obj.feature.FeatureCode }}"
+                                           class="year-no {{corp_feature.image_name }}" value="{{ corp_feature.year_no }}"
+                                         data-corp="{{ corp_feature.corp.CorpCode }}" data-feature="{{ obj.feature.FeatureCode }}"/>
+                                </td>
+                            {% endfor %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script src="/static/TeamFeature/js/jquery-3.6.0.min.js"></script>
+<script src="/static/TeamFeature/js/jquery-confirm.min.js"></script>
+<script src="/static/TeamFeature/js/fontawesome.min.js"></script>
+<script src="/static/TeamFeature/js/MyCode.js"></script>
+</html>

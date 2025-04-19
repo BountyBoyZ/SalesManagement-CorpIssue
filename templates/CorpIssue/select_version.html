@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>انتخاب نسخه جدید</title>
+    <link rel="stylesheet" href="{% static 'CorpIssue/css/corp_list.css' %}">
+</head>
+<body>
+    <h1>انتخاب نسخه جدید برای {{ corp.corp_name }}</h1>
+
+    <div class="container">
+        <section class="status-section">
+            <h2>نسخه‌های موجود</h2>
+            <form method="post" action="{% url 'select_version' corp.corp_code %}">
+                {% csrf_token %}
+                <div class="version-list">
+                    {% for version in available_versions %}
+                        <label class="version-item">
+                            <input type="radio" name="selected_version" value="{{ version.version_number }}">
+                            <span class="version-text">{{ version.version_number }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+                <button type="submit" class="create-version-btn">انتخاب نسخه</button>
+            </form>
+        </section>
+    </div>
+</body>
+</html>

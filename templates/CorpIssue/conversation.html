@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/style.css" >
+{#     <link href="{% static 'CorpIssue/css/style.css' %}" type="text/css" rel="stylesheet"/>#}
+    <meta charset="UTF-8">
+     <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/bootstrap.css" >
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/bootstrap.rtl.css" >
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/all.css" >
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/fontawesome.css" >
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/solid.css" >
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/brands.css" >
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/jquery-confirm.min.css" >
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/jquery-ui.css" >
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/jquery-ui.structure.css" >
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/jquery-ui.theme.css" >
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/persian-datepicker.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/style.css" >
+    <link href="/static/CorpIssue/FA/Web/css/all.css" rel="stylesheet">
+    <title>Conversation</title>
+</head>
+<body>
+
+
+    <div class="main-title">
+        <p>تغییر درخواست پاسخگویی هر تیم به صورت حساب</p>
+    </div>
+
+{% if corp_issue_detail_finish %}
+    <h4>این درخواست توسط مدیر فروش خاتمه یافته  ^_^ </h4>
+    {% else %}
+    <form name="add_new_chat" class="add-new-chat">
+    <div class="main chat-page">
+
+
+        <div class="picture">
+            <div class="item company">
+                <div class="pic"><img src="/static/CorpIssue/images/corp_logo/{{ corp.corp_code}}.png" alt="{{ corp.corp_name }}" title="{{ corp.corp_name }}"> </div>
+
+{#                <div class="name"><p>{{ corp.corp_name }}</p></div>#}
+
+            </div>
+
+            <div class="item team">
+                <div class="pic"><img src="/static/CorpIssue/images/team/{{ team.team_code}}.png" alt="{{ team.team_name }}" title="{{ team.team_name }}"></div>
+
+
+            </div>
+        </div>
+        <div class="detail-corp-issue col-12">
+            {% if detail.task_number %}
+                 <div class=" issue task-number col-1">
+                    <span class="titr"> شماره تسک : </span>
+                    <span>{{ detail.task_number }}  </span>
+                </div>
+            {% endif %}
+            <div class=" issue corp-issue-title col-2">
+                <span class="titr"> عنوان : </span>
+                <span>{{ detail.title }}  </span>
+            </div>
+            <div class="issue corp-issue-conversation col-4">
+                <span class="titr">شرح :  </span>
+                <span>{{ detail.description }} </span>
+            </div>
+            <div class=" issue corp-issue-hour col-2">
+                <span class="titr"> ساعت کار کرد : </span>
+                <span>{{ detail.work_hour }}  </span>
+            </div>
+            <div class=" issue corp-issue-version col-1">
+                <span class="titr"> نسخه : </span>
+                <span>{{ detail.version }}  </span>
+            </div>
+        </div>
+
+
+
+
+
+
+        <input name="corp_item_id" type="hidden" value="{{ corp_item.id}}">
+        <input name="corp_item_detail_id" type="hidden" value="{{ corp_item_detail.id}}">
+        <input name="issue_detail_state" type="hidden" value="{{ detail.state}}">
+        <input  name="user_type" type="hidden" value="{{ current_user.user_type}}">
+        <input  name="user_name" type="hidden" value="{{ current_user.username}}">
+        <input  name="user_photo" type="hidden" value="{{ current_user.photo}}">
+        <input  name="user_fullname" type="hidden" value="{{ current_user.full_name}}">
+        <input  name="position_class" type="hidden" value="{{ current_user.position_class}}">
+        <div class="chat-box">
+            {% for user in user_list %}
+
+                {% if user.position_class == 'right' %}
+                    <div class="text-box right-box " data-key="{{ user.chat_id }}">
+                        <div class="pic-person">
+                            <img onerror="this.src='/static/CorpIssue/images/Icon/Female.png'"  src="{{ user.photo}}" default-src="/static/CorpIssue/images/Icon/Female.png"  alt="{{user.full_name}}" title="{{user.full_name}}">
+                        </div>
+                        <input name="chat_owner" id="chat-owner" type="hidden" value="{{user.user_name}}">
+                        <input class="is-lock" name="chat_is_lock" id="chat-owner" type="hidden" value="{{ user.chat_islock }}">
+                        <div class="text">
+                            <div class="iner">{{user.chat}}</div>
+                            <textarea class="edit-chat hidden" rows="2" cols="80" ></textarea>
+                        </div>
+                        {#                    اگر چت قفل نشده یعنی ارسال نشده ایکون ویرایش و ادیت براش نشون بده#}
+                        {% if not user.chat_islock  %}
+                            {% if user.user_name == current_user.username %}
+                                <div class="temp" data-key="{{ user.chat_id }}">
+                                <div class="edit-icon">
+                                    <i title="ویرایش مکالمه" class="fa-sharp fa-solid fa-pen-to-square edit"></i>
+                                </div>
+                                <div class="delete-icon">
+                                    <i title="حذف مکالمه" class=" fa-solid fa-trash-can trash"></i>
+                                </div>
+                                <div class="cancel-edit-icon hidden">
+                                    <i title="لغو تغییرات" class="fa-sharp fa-solid fa-circle-xmark"></i>
+                                </div>
+                                <div class="save-edit-icon hidden">
+                                    <i title=" ذخیره تغییرات" class="fa-sharp fa-solid fa-circle-check"></i>
+                                </div>
+                          </div>
+                            {% endif %}
+                        {% endif %}
+                        <div class="chat-date-time">
+                            <span>{{ user.date }}</span>
+                        </div>
+
+                     </div>
+                {% else %}
+                    <div class="text-box left-box" data-key="{{ user.chat_id }}">
+
+                        <div class="chat-date-time-left">
+                            <span>{{ user.date }}</span>
+                        </div>
+                        {% if not user.chat_islock  %}
+                            {% if user.user_name == current_user.username %}
+                                <div class="temp" data-key="{{user.chat_id}}">
+                                <div class="edit-icon">
+                                    <i title=" ویرایش مکالمه" class="fa-sharp fa-solid fa-pen-to-square edit"></i>
+                                </div>
+                                <div class="delete-icon">
+                                    <i title="حذف مکالمه" class=" fa-solid fa-trash-can trash"></i>
+                                </div>
+                                <div class="cancel-edit-icon hidden">
+                                    <i title="لغو تغییرات" class="fa-sharp fa-solid fa-circle-xmark"></i>
+                                </div>
+                                <div class="save-edit-icon hidden">
+                                    <i title=" ذخیره تغییرات" class="fa-sharp fa-solid fa-circle-check"></i>
+                                </div>
+                          </div>
+                            {% endif %}
+                        {% endif %}
+                        <div class="text">
+                            <div class="iner ">{{ user.chat }}</div>
+                            <textarea class="edit-chat hidden" rows="2" cols="80"></textarea>
+                        </div>
+
+
+                        <div class="pic-person">
+                            <img src="{{ user.photo}}"  alt="{{user.full_name}}" title="{{user.full_name}}">
+                        </div>
+                        <input name="chat_owner" id="chat-owner" type="hidden" value="{{user.user_name}}">
+                     </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+         <div class="info col-12">
+
+
+                    <div class="part description">
+                        <div class="back-icon"><i class="fa-solid  fa-pencil" aria-hidden="true"></i></div>
+                        <label for="">شرح</label>
+                        <textarea  cols="100" rows="2" class="chat-description" type="" name="chat_description" id=""></textarea>
+                    </div>
+                   <div class="add">
+                      <div class="back-icon"><button type="button" class="save" aria-hidden="true"> ثبت </button></div>
+                    </div>
+
+{#                    <div class="part date">#}
+{#                        <div class="back-icon"><i class="fa-solid  fa-calendar" aria-hidden="true"></i></div>#}
+{#                        <label for="">تاریخ درخواست</label>#}
+{#                        <input class="chat-date" type="text" name="chat_date" id="">#}
+{#                    </div>#}
+
+        </div>
+
+
+
+
+    </div>
+
+    <div class="buttons">
+        <div class="key register"><button id="send-all-new-chats" type="button">ارسال</button></div>
+        <div class="key cancel-chat"><button type="button">بستن</button></div>
+        {% if current_user.user_type == 1  %}
+        <div class="key finish" ><button type="button">خاتمه</button></div>
+        {% endif %}
+    </div>
+</form>
+{% endif %}
+</body>
+<script src="/static/CorpIssue/js/jquery-3.6.0.min.js"></script>
+<script src="/static/CorpIssue/js/fontawesome.js"></script>
+<script src="/static/CorpIssue/js/jquery-confirm.js"></script>
+<script src="/static/CorpIssue/js/jquery-ui.js"></script>
+<script src="/static/CorpIssue/js/persian-date.min.js"></script>
+<script src="/static/CorpIssue/js/persian-datepicker.min.js"></script>
+{#<script src="/static/CorpIssue/js/MyCode.js"></script>#}
+<script src="/static/CorpIssue/js/MyCodeNew.js"></script>
+</html>

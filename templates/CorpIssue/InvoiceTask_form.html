@@ -1,0 +1,602 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=deivce-width, initial-scale=1.0">
+    <title>صورت حساب ها</title>
+    <link rel="stylesheet" href="{% static 'CorpIssue/css/InvoiceTask_form.css' %}">
+    <script src="{% static 'CorpIssue/js/jquery-3.6.0.min.js' %}"></script>
+    <script src="{% static 'CorpIssue/js/corp_issue.js' %}" defer></script>
+</head>
+<div style="position: fixed; left: 10px; bottom: 5px; z-index: 9999; font-size: 11px; color: #007bff; display: flex; align-items: center; cursor: pointer;">
+    <img src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/faq.png' %}" style="width: 16px; height: 16px; margin-left: 4px;">
+    <a href="{% static help_doc %}" style="color: #007bff; text-decoration: none; font-size: 11px;" download>به کمک نیاز دارید ؟</a>
+</div>
+<body>
+    <div class="header">
+        <div class="header-right">
+            <img src="{% static 'CorpIssue/images/corp_logo/' %}{{ corp_code }}.png" alt="Logo" class="corp-logo">
+        </div>
+        <div class="header-center">
+            <div class="header-title-container">
+                <h1 class="header-title">صورت حساب شرکت {{ corp_name }}</h1>
+                <div class="header-subtitle">بررسی تسک ها</div>
+            </div>
+        </div>
+        <div class="header-left">
+            <a id="help-download-link" href="{% static help_doc %}" download class="help-book-link">
+                <img id="help-book-icon"
+                     src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/book-grey.png' %}"
+                     alt="راهنما"
+                     class="help-book-icon">
+            </a>
+            <span class="version-number" style="margin-right: 8px;">نسخه {{ version_number }}</span>
+        </div>
+    </div>
+
+    <div class="main-wrapper">
+        <div class="content-section">
+            <div class="filter-container">
+                <div class="filter-toggle">
+                    <span>فیلتر</span>
+                </div>
+                <div class="filter-panel">
+                    <form method="GET" action="{% url 'invoice_tasks' invoice_id=invoice.id %}">
+                        <div class="filter-grid custom-filter-grid">
+                            <!-- First Column -->
+                            <div class="filter-column">
+                                <!-- شناسه تسک -->
+                                <div class="filter-row">
+                                    <label for="task_id">شناسه تسک</label>
+                                    <input type="text" id="task_id" name="task_id" class="filter-input" dir="rtl" placeholder="شناسه تسک" value="{{ request.GET.task_id }}">
+                                </div>
+                                <!-- عنوان تسک -->
+                                <div class="filter-row">
+                                    <label for="task_title">عنوان تسک</label>
+                                    <input type="text" id="task_title" name="task_title" class="filter-input" dir="rtl" placeholder="عنوان تسک" value="{{ request.GET.task_title }}">
+                                </div>
+                                <!-- کارکرد اعلام شده و کارکرد واقعی (side by side) -->
+                                <div class="filter-row dual-scroll-row">
+                                    <div class="work-hours-filter small" id="invoice-work-hours-filter">
+                                        <label>کارکرد اعلام شده<br>(نفر ساعت)</label>
+                                        <div class="filter-select-container">
+                                            <!-- Default dropdown view -->
+                                            <select class="filter-select work-hours-type" name="invoice_work_hours_type" data-target="invoice">
+                                                <option value="all">همه</option>
+                                                <option value="gt">بزرگتر است از</option>
+                                                <option value="lt">کوچکتر است از</option>
+                                                <option value="eq">برابر است با</option>
+                                                <option value="between">بین</option>
+                                            </select>
+                                            
+                                            <!-- Input view (initially hidden) -->
+                                            <div class="work-hours-inputs-wrapper" style="display: none;">
+                                                <div class="comparison-label"></div>
+                                                <div class="inputs-container">
+                                                    <input type="number" 
+                                                           step="0.5" 
+                                                           name="invoice_work_hours_min" 
+                                                           class="filter-input work-hours-input no-search-icon">
+                                                    <span class="between-separator" style="display: none;">و</span>
+                                                    <input type="number" 
+                                                           step="0.5" 
+                                                           name="invoice_work_hours_max" 
+                                                           class="filter-input work-hours-input no-search-icon" 
+                                                           style="display: none;">
+                                                </div>
+                                                <button type="button" class="clear-filter" aria-label="پاک کردن فیلتر">
+                                                    <img src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/trashcan.png' %}" 
+                                                         alt="پاک کردن"
+                                                         class="clear-filter-icon"
+                                                         data-hover="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/trashcan-hover.png' %}">
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="work-hours-filter small" id="real-work-hours-filter">
+                                        <label>کارکرد واقعی<br>(نفر ساعت)</label>
+                                        <div class="filter-select-container">
+                                            <!-- Default dropdown view -->
+                                            <select class="filter-select work-hours-type" name="real_work_hours_type" data-target="real">
+                                                <option value="all">همه</option>
+                                                <option value="gt">بزرگتر است از</option>
+                                                <option value="lt">کوچکتر است از</option>
+                                                <option value="eq">برابر است با</option>
+                                                <option value="between">بین</option>
+                                            </select>
+                                            
+                                            <!-- Input view (initially hidden) -->
+                                            <div class="work-hours-inputs-wrapper" style="display: none;">
+                                                <div class="comparison-label"></div>
+                                                <div class="inputs-container">
+                                                    <input type="number" 
+                                                           step="0.5" 
+                                                           name="real_work_hours_min" 
+                                                           class="filter-input work-hours-input no-search-icon">
+                                                    <span class="between-separator" style="display: none;">و</span>
+                                                    <input type="number" 
+                                                           step="0.5" 
+                                                           name="real_work_hours_max" 
+                                                           class="filter-input work-hours-input no-search-icon" 
+                                                           style="display: none;">
+                                                </div>
+                                                <button type="button" class="clear-filter" aria-label="پاک کردن فیلتر">
+                                                    <img src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/trashcan.png' %}" 
+                                                         alt="پاک کردن"
+                                                         class="clear-filter-icon"
+                                                         data-hover="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/trashcan-hover.png' %}">
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- وضعیت تسک ها -->
+                                <div class="filter-row">
+                                    <label>وضعیت تسک</label>
+                                    <div class="status-icons-grid">
+                                        <!-- Status 1 -->
+                                        <div class="status-filter-item">
+                                            <label class="status-icon-label">
+                                                <input type="checkbox" name="status" value="InvoiceTaskStatus_ApprovedByProductAssistant" class="status-checkbox" {% if 'InvoiceTaskStatus_ApprovedByProductAssistant' in selected_statuses %}checked{% endif %}>
+                                                <img src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/status-approved-productassistant-grey.png' %}" alt="تایید شده توسط معاون محصول" class="status-filter-icon" data-hover="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/status-approved-productassistant-hover.png' %}" data-selected="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/status-approved-productassistant.png' %}">
+                                                <span class="status-name">تایید شده توسط معاون محصول</span>
+                                            </label>
+                                        </div>
+                                        <!-- Status 2 -->
+                                        <div class="status-filter-item">
+                                            <label class="status-icon-label">
+                                                <input type="checkbox" name="status" value="InvoiceTaskStatus_RejectedByProductAssistant" class="status-checkbox" {% if 'InvoiceTaskStatus_RejectedByProductAssistant' in selected_statuses %}checked{% endif %}>
+                                                <img src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/status-rejected-productassistant-grey.png' %}" alt="رد شده توسط معاون محصول" class="status-filter-icon" data-hover="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/status-rejected-productassistant-hover.png' %}" data-selected="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/status-rejected-productassistant.png' %}">
+                                                <span class="status-name">رد شده توسط معاون محصول</span>
+                                            </label>
+                                        </div>
+                                        <!-- Status 3 -->
+                                        <div class="status-filter-item">
+                                            <label class="status-icon-label">
+                                                <input type="checkbox" name="status" value="InvoiceTaskStatus_ApprovedByProjectManager" class="status-checkbox" {% if 'InvoiceTaskStatus_ApprovedByProjectManager' in selected_statuses %}checked{% endif %}>
+                                                <img src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/status-approved-projectmanager-grey.png' %}" alt="تایید شده توسط مدیر پروژه" class="status-filter-icon" data-hover="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/status-approved-projectmanager-hover.png' %}" data-selected="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/status-approved-projectmanager.png' %}">
+                                                <span class="status-name">تایید شده توسط مدیر پروژه</span>
+                                            </label>
+                                        </div>
+                                        <!-- Status 4 -->
+                                        <div class="status-filter-item">
+                                            <label class="status-icon-label">
+                                                <input type="checkbox" name="status" value="InvoiceTaskStatus_PendingByProductAssistant" class="status-checkbox" {% if 'InvoiceTaskStatus_PendingByProductAssistant' in selected_statuses %}checked{% endif %}>
+                                                <img src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/status-pending-grey.png' %}" alt="در انتظار معاون محصول" class="status-filter-icon" data-hover="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/status-pending-hover.png' %}" data-selected="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/status-pending.png' %}">
+                                                <span class="status-name">در انتظار معاون محصول</span>
+                                            </label>
+                                        </div>
+                                        <!-- Status 5 -->
+                                        <div class="status-filter-item">
+                                            <label class="status-icon-label">
+                                                <input type="checkbox" name="status" value="InvoiceTaskStatus_ReturnedByProjectManager" class="status-checkbox" {% if 'InvoiceTaskStatus_ReturnedByProjectManager' in selected_statuses %}checked{% endif %}>
+                                                <img src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/status-returned-grey.png' %}" alt="برگشت داده شده" class="status-filter-icon" data-hover="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/status-returned-hover.png' %}" data-selected="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/status-returned.png' %}">
+                                                <span class="status-name">برگشت داده شده</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Second Column -->
+                            <div class="filter-column">
+                                <!-- نوع تسک -->
+                                <div class="filter-row">
+                                    <label for="task_kind">نوع تسک</label>
+                                    <select id="task_kind" name="task_kind" class="filter-select">
+                                        <option value="">همه</option>
+                                        {% for task_type in task_types %}
+                                            <option value="{{ task_type.id }}" {% if request.GET.task_kind == task_type.id|stringformat:"s" %}selected{% endif %}>
+                                                {{ task_type.value }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <!-- نسبت کارکرد اعلام شده به کارکرد واقعی -->
+                                <div class="filter-row">
+                                    <label>نسبت کارکرد اعلام شده به کارکرد واقعی</label>
+                                    <div class="work-hours-filter" id="work-hours-ratio-filter">
+                                        <div class="filter-select-container">
+                                            <select class="filter-select ratio-type" name="work_hours_ratio_type" data-target="ratio">
+                                                <option value="all">همه</option>
+                                                <option value="gt">بزرگتر است از</option>
+                                                <option value="lt">کوچکتر است از</option>
+                                                <option value="eq">برابر است با</option>
+                                            </select>
+                                            
+                                            <div class="work-hours-inputs-wrapper" style="display: none;">
+                                                <div class="comparison-label"></div>
+                                                <div class="inputs-container">
+                                                    <input type="number" 
+                                                           step="0.1" 
+                                                           name="work_hours_ratio_value" 
+                                                           class="filter-input work-hours-input"
+                                                           placeholder="درصد">
+                                                </div>
+                                                <button type="button" class="clear-filter" aria-label="پاک کردن فیلتر">
+                                                    <img src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/trashcan.png' %}" 
+                                                         alt="پاک کردن"
+                                                         class="clear-filter-icon"
+                                                         data-hover="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/trashcan-hover.png' %}">
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- نسبت پیاده سازی به تست و رفع اشکال -->
+                                <div class="filter-row">
+                                    <label>نسبت پیاده سازی به تست و رفع اشکال</label>
+                                    <div class="work-hours-filter" id="implementation-ratio-filter">
+                                        <div class="filter-select-container">
+                                            <select class="filter-select ratio-type" name="implementation_ratio_type" data-target="implementation">
+                                                <option value="all">همه</option>
+                                                <option value="gt">بزرگتر است از</option>
+                                                <option value="lt">کوچکتر است از</option>
+                                                <option value="eq">برابر است با</option>
+                                            </select>
+                                            
+                                            <div class="work-hours-inputs-wrapper" style="display: none;">
+                                                <div class="comparison-label"></div>
+                                                <div class="inputs-container">
+                                                    <input type="number" 
+                                                           step="0.1" 
+                                                           name="implementation_ratio_value" 
+                                                           class="filter-input work-hours-input"
+                                                           placeholder="درصد">
+                                                </div>
+                                                <button type="button" class="clear-filter" aria-label="پاک کردن فیلتر">
+                                                    <img src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/trashcan.png' %}" 
+                                                         alt="پاک کردن"
+                                                         class="clear-filter-icon"
+                                                         data-hover="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/trashcan-hover.png' %}">
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- حذف فیلترها -->
+                                <div class="filter-row button-row">
+                                    <button type="button" class="clear-filters-btn red-pill" id="clearFiltersBtn">حذف تمامی فیلترها</button>
+                                    <button type="submit" class="search-button wide">جست و جو</button>
+                                </div>
+                            </div>
+
+                            <!-- Third Column: تیم (Square grid, bigger icons) -->
+                            <div class="filter-column team-column">
+                                <label>تیم</label>
+                                <div class="multi-select-container team-square">
+                                    {% for team in teams %}
+                                    <div class="multi-select-item {% if team.team_code in selected_teams %}selected{% endif %}">
+                                        <input type="checkbox" 
+                                               id="team_{{ team.team_code }}" 
+                                               name="team" 
+                                               value="{{ team.team_code }}" 
+                                               class="team-checkbox" 
+                                               {% if team.team_code in selected_teams %}checked{% endif %}>
+                                        <img src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/' %}{{ team.team_code }}{% if team.team_code in selected_teams %}.png{% else %}-grey.png{% endif %}"
+                                             alt="{{ team.team_name }}"
+                                             class="team-icon big {% if team.team_code not in selected_teams %}grey{% endif %}"
+                                             data-hover="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/' %}{{ team.team_code }}-hover.png"
+                                             data-selected="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/' %}{{ team.team_code }}.png"
+                                             title="{{ team.team_name }}">
+                                        <span class="team-name">{{ team.team_name }}</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <!-- Fourth Column: پروژه (Square grid, bigger icons) -->
+                            <div class="filter-column project-column">
+                                <label>پروژه</label>
+                                <div class="multi-select-container project-square">
+                                    {% for project in team_projects %}
+                                    
+                                    <div class="multi-select-item {% if project.id|stringformat:'s' in selected_projects %}selected{% endif %}">
+                                        <input type="checkbox"
+                                               id="project_{{ project.id }}"
+                                               name="project"
+                                               value="{{ project.id }}"
+                                               class="project-checkbox"
+                                               data-team-code="{{ project.team_code }}"
+                                               {% if project.id|stringformat:'s' in selected_projects %}checked{% endif %}>
+                                        <img src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/' %}{{ project.team_code }}{% if project.id|stringformat:'s' in selected_projects %}.png{% else %}-grey.png{% endif %}"
+                                             alt="{{ project.project_name }}"
+                                             class="project-icon big {% if project.id|stringformat:'s' not in selected_projects %}grey{% endif %}"
+                                             data-hover="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/' %}{{ project.team_code }}-hover.png"
+                                             data-selected="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/' %}{{ project.team_code }}.png"
+                                             title="{{ project.project_name }}">
+                                        <span class="project-name">{{ project.project_name }}</span>
+                                    </div>
+                                    
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% if is_product_assistant and not show_table %}
+                <div style="color: #1abc9c; font-family: Vazirmatn-Bold, Vazirmatn, sans-serif; font-size: 1.5rem; text-align: center; margin-top: 60px;">
+                    فرم نسخه برای مدیر فروش ارسال گردید.
+                </div>
+            {% else %}
+                {% if is_product_assistant %}
+                    <div class="header-left">
+                        <button class="approve-all-btn" onclick="approveAllTasks('{{ invoice.id }}')">تایید تمامی تسک ها</button>
+                    </div>
+                {% endif %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>شناسه تسک</th>
+                            <th>عنوان تسک</th>
+                            <th>نوع تسک</th>
+                            <th>پروژه</th>
+                            <th>تیم</th>
+                            <th>کارکرد واقعی</th>
+                            <th>کارکرد اعلامی</th>
+                            <th>وضعیت تسک</th>
+                            <th>عملیات</th>
+                            {% if is_team_manager %}
+                                <th>دلیل عدم تایید</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for task in tasks_data %}
+                            <tr data-task-id="{{ task.task_id }}">
+                                <td>{{ task.task_id }}</td>
+                                <td>{{ task.task_title }}</td>
+                                <td>{{ task.task_type }}</td>
+                                <td>{{ task.project }}</td>
+                                <td>
+                                    <img src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/' %}{{ task.team }}.png" 
+                                         alt="{{ task.team }}"
+                                         class="table-team-icon"
+                                         title="{{ task.team }}">
+                                </td>
+                                <td class="real-work-hours" onclick="toggleSubTasks('{{ task.task_id }}')">
+                                    <div class="hours-pill">
+                                        <img src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/clock.png' %}" 
+                                             alt="clock" 
+                                             class="clock-icon">
+                                        <span class="hours-value">{{ task.real_work_hours }}</span>
+                                    </div>
+                                    <div class="sub-tasks-container" id="sub-tasks-{{ task.task_id }}"></div>
+                                </td>
+                                <td>
+                                    <div class="hours-pill">
+                                        <img src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/clock.png' %}" 
+                                             alt="clock" 
+                                             class="clock-icon">
+                                        <span class="hours-value">{{ task.invoice_work_hours }}</span>
+                                    </div>
+                                </td>
+                                <td>
+    {% if task.status == 'Approved by Product Assistant' %}
+        <div class="status-icon-tooltip" data-tooltip="تایید شده توسط معاون محصول">
+            <img src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/status-approved-productassistant.png' %}" 
+                 alt="تایید شده توسط معاون محصول"
+                 class="status-icon">
+        </div>
+    {% elif task.status == 'Rejected by product assisstant' %}
+        <div class="status-icon-tooltip" data-tooltip="رد شده توسط معاون محصول">
+            <img src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/status-rejected-productassistant.png' %}" 
+                 alt="رد شده توسط معاون محصول"
+                 class="status-icon">
+        </div>
+    {% elif task.status == 'Approved by Project Manager' %}
+        <div class="status-icon-tooltip" data-tooltip="تایید شده توسط مدیر پروژه">
+            <img src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/status-approved-projectmanager.png' %}" 
+            </div>
+        {% elif task.status == 'Approved by Project Manager' %}
+            <div class="status-icon-tooltip" data-tooltip="تایید شده توسط مدیر پروژه">
+                <img src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/status-approved-projectmanager.png' %}" 
+                     alt="تایید شده توسط مدیر پروژه"
+                     class="status-icon">
+            </div>
+        {% elif task.status == 'در انتظار معاون محصول' or task.status_class == 'status-pending' %}
+        <div class="status-icon-tooltip" data-tooltip="در انتظار معاون محصول">
+            <img src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/status-pending.png' %}" 
+                    alt="در انتظار معاون محصول"
+                    class="status-icon">
+            </div>
+        {% else %}
+            <span class="status-pill {{ task.status_class }}">
+                {% if task.status == 'InvoiceTaskStatus_Rejected' %}
+                    رد شده
+                {% elif task.status == 'InvoiceTaskStatus_Deleted' %}
+                    حذف شده
+                {% elif task.status == 'InvoiceTaskStatus_PendingByProductAssistant' %}
+                    در انتظار معاون محصول
+                {% elif task.status == 'InvoiceTaskStatus_ReturnedByProjectManager' %}
+                    برگشت داده شده
+                {% else %}
+                    {{ task.status }}
+                {% endif %}
+            </span>
+        {% endif %}
+</td>
+                                    <td class="test">
+        {% if is_product_assistant %}
+            <button class="approve-btn" onclick="approveTask('{{ task.task_id }}')">
+                <img src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/tick-grey.png' %}" 
+                     alt="✔" 
+                     class="action-icon approve-icon"
+                     data-hover="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/tick-hover.png' %}"
+                     data-selected="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/tick.png' %}">
+            </button>
+            <button class="reject-btn" onclick="showRejectionModal('{{ task.task_id }}')">
+                <img src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/cross-grey.png' %}" 
+                     alt="✖" 
+                     class="action-icon reject-icon"
+                     data-hover="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/cross-hover.png' %}"
+                     data-selected="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/cross.png' %}">
+            </button>
+        {% elif is_team_manager %}
+            <button class="approve-btn" onclick="approveTask('{{ task.task_id }}')">
+                <img src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/tick-grey.png' %}" 
+                     alt="✔" 
+                     class="action-icon approve-icon"
+                     data-hover="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/tick-hover.png' %}"
+                     data-selected="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/tick.png' %}">
+            </button>
+        {% endif %}
+</td>
+                                    {% if is_team_manager %}
+                                        <td>
+                                            {% if task.rejection_title %}
+                                                <span class="rejection-reason">{{ task.rejection_title }}</span>
+                                                <button class="info-btn" onclick="showRejectionDetails('{{ task.task_id }}')">!</button>
+                                            {% endif %}
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+
+                <div class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?{% for key, values in request.GET.lists %}{% if key != 'page' %}{% for value in values %}{{ key }}={{ value }}&{% endfor %}{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">قبلی</a>
+    {% endif %}
+    
+    <span class="current-page">صفحه {{ page_obj.number }} از {{ page_obj.paginator.num_pages }}</span>
+    
+    {% if page_obj.has_next %}
+        <a href="?{% for key, values in request.GET.lists %}{% if key != 'page' %}{% for value in values %}{{ key }}={{ value }}&{% endfor %}{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">بعدی</a>
+    {% endif %}
+</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rejection Modal -->
+    <div id="rejection-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeRejectionModal()">&times;</span>
+            <h2>دلیل عدم تایید</h2>
+            <form id="rejection-form" onsubmit="submitRejectionForm(event)">
+                <input type="hidden" id="rejection-task-id" name="task_id">
+                <div class="form-group">
+                    <label for="rejection-reason">دلیل عدم تایید را انتخاب کنید:</label>
+                    <select id="rejection-reason" name="rejection_reason" required>
+                        <option value="" selected>----</option>
+                        {% for reason in rejection_reasons %}
+                            <option value="{{ reason.id }}">{{ reason.value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="rejection-explanation">توضیحات دلیل عدم تایید:</label>
+                    <textarea id="rejection-explanation" name="rejection_explanation" required></textarea>
+                </div>
+                <button type="submit" class="submit-btn">ارسال به مدیر پروژه</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Rejection Details Modal -->
+    <div id="rejection-details-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeRejectionDetailsModal()">&times;</span>
+            <h2 id="rejection-details-title"></h2>
+            <p id="rejection-details-explanation"></p>
+        </div>
+    </div>
+
+    <!-- Filter Modal -->
+    <div id="filter-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeFilterModal()">&times;</span>
+            <h2>فیلتر تسک ها</h2>
+            <form method="GET" action="{% url 'invoice_tasks' invoice_id=invoice.id %}">
+                <div class="form-group">
+                    <label for="task_type">نوع تسک:</label>
+                    <select id="task_type" name="task_type">
+                        <option value="">همه</option>
+                        {% for task_type in task_types %}
+                            <option value="{{ task_type.id }}">{{ task_type.value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% if is_product_assistant %}
+                <div class="form-group">
+                    <label for="team">تیم:</label>
+                    <select id="team" name="team">
+                        <option value="">همه</option>
+                        {% for team in teams %}
+                            <option value="{{ team.team_code }}">{{ team.team_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+                <div class="form-group">
+                    <label for="invoice_work_hours">کارکرد اعلامی:</label>
+                    <input type="number" id="invoice_work_hours" name="invoice_work_hours" placeholder="ساعت">
+                    <select id="invoice_work_hours_operator" name="invoice_work_hours_operator">
+                        <option value="eq">برابر</option>
+                        <option value="gt">بزرگتر</option>
+                        <option value="lt">کوچکتر</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="real_work_hours">کارکرد واقعی :</label>
+                    <input type="number" id="real_work_hours" name="real_work_hours" placeholder="ساعت">
+                    <select id="real_work_hours_operator" name="real_work_hours_operator">
+                        <option value="eq">برابر</option>
+                        <option value="gt">بزرگتر</option>
+                        <option value="lt">کوچکتر</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="status">وضعیت تسک:</label>
+                    <select id="status" name="status">
+                        <option value="">همه</option>
+                        {% for status in statuses %}
+                            <option value="{{ status.id }}">{{ status.value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="submit-btn">اعمال فیلتر</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Send to Sales Manager Modal -->
+    <div id="send-to-sales-manager-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeSendToSalesManagerModal()">&times;</span>
+            <h2>ارسال به مدیر فروش</h2>
+            <p>آیا می خواهید با تایید کردن همه تسک ها نسخه را برای مدیر فروش ارسال کنید؟</p>
+            <div class="modal-buttons">
+                <button class="confirm-btn" onclick="confirmSendToSalesManager()">تایید</button>
+                <button class="cancel-btn" onclick="closeSendToSalesManagerModal()">خیر</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Response Modal -->
+    <div id="response-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeResponseModal()">&times;</span>
+            <h2>پاسخ فناوران</h2>
+            <form id="response-form" onsubmit="submitResponse(event)">
+                <input type="hidden" id="response-task-id" name="task_id">
+                <div class="form-group">
+                    <label for="response-text">پاسخ:</label>
+                    <textarea id="response-text" name="response" required></textarea>
+                </div>
+                <button type="submit" class="submit-btn">ثبت پاسخ</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const csrfToken = '{{ csrf_token }}';
+    </script>
+</body>
+</html>

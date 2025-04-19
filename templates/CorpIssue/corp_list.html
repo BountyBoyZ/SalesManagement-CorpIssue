@@ -1,0 +1,109 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لیست شرکت‌ها</title>
+    <link rel="stylesheet" href="{% static 'CorpIssue/css/corp_list.css' %}">
+    <script src="{% static 'CorpIssue/js/jquery-3.6.0.min.js' %}"></script>
+    <script src="{% static 'CorpIssue/js/corp_issue.js' %}" defer></script>
+</head>
+
+<body>
+    <div class="header">
+        <div class="header-right">
+            <h1>لیست شرکت‌ها</h1>
+        </div>
+        <div class="header-left">
+            <a id="help-download-link" href="{% static help_doc %}" download class="help-book-link">
+                <img id="help-book-icon"
+                     src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/book-grey.png' %}"
+                     alt="راهنما"
+                     class="help-book-icon">
+            </a>
+        </div>
+    </div>
+
+    <div class="container">
+        <section class="corp-section">
+            <h2>شرکت‌ها</h2>
+            <div class="corp-grid">
+                {% for corp in corps %}
+                    <a href="{% url 'list_corps' corp.corp_code %}" 
+                       class="corp-item {% if corp.corp_code == selected_corp_code %}selected{% endif %}">
+                        <img src="{% if corp.corp_code == selected_corp_code %}
+                                      {% static 'CorpIssue/images/corp_logo/' %}{{ corp.corp_code }}.png
+                                      {% else %}
+                                      {% static 'CorpIssue/images/CorpLogoGray/' %}{{ corp.corp_code }}-Gray.png
+                                      {% endif %}" 
+                             alt="{{ corp.corp_name }}">
+                    </a>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="status-section">
+            {% if corp %}
+                <h2>نام شرکت: {{ corp.corp_name }}</h2>
+                <img src="{% static 'CorpIssue/images/corp_logo/' %}{{ corp.corp_code }}.png" 
+                     alt="{{ corp.corp_name }}" 
+                     class="corp-logo-large">
+
+                {% if latest_invoice %}
+                    <p>آخرین نسخه: {{ latest_invoice.version_number.version_number }}</p>
+                    <p>وضعیت نسخه: 
+                        <span class="status-badge 
+                        {% if status_value == 'نسخه باز است' %}status-open
+                        {% elif status_value == 'نسخه بسته است' %}status-closed
+                        {% elif status_value == 'در حال بررسی' %}status-under-review
+                        {% elif status_value == 'ارسال شده به مدیر فروش' %}status-sales-manager
+                        {% elif status_value == 'ارسال شده به مشتری' %}status-customer
+                        {% else %}status-other{% endif %}">
+                        {{ status_value }}
+                        </span>
+                    </p>
+                    {% if success_message %}
+                        <p class="success-text">{{ success_message }}</p>
+                    {% endif %}
+
+                    {% if can_create_new_version %}
+                        <form method="post" action="{% url 'select_version' corp.corp_code %}">
+                            {% csrf_token %}
+                            <select id="version-select" name="selected_version" onchange="toggleCreateButton()" class="version-select">
+                                {% if available_versions %}
+                                    {% for version in available_versions %}
+                                        <option value="{{ version.version_number }}" {% if forloop.first %}selected{% endif %}>{{ version.version_number }}</option>
+                                    {% endfor %}
+                                {% else %}
+                                    <option value="" selected>لطفا نسخه جدید را انتخاب کنید</option>
+                                {% endif %}
+                            </select>
+                            <button type="submit" class="create-version-btn" id="create-version-btn" disabled>صورت حساب جدید</button>
+                        </form>
+                    {% endif %}
+                {% else %}
+                    <p>این شرکت هیچ نسخه‌ای ندارد.</p>
+                    {% if can_create_new_version %}
+                        <form method="post" action="{% url 'select_version' corp.corp_code %}">
+                            {% csrf_token %}
+                            <select id="version-select" name="selected_version" onchange="toggleCreateButton()" class="version-select">
+                                {% if available_versions %}
+                                    {% for version in available_versions %}
+                                        <option value="{{ version.version_number }}" {% if forloop.first %}selected{% endif %}>{{ version.version_number }}</option>
+                                    {% endfor %}
+                                {% else %}
+                                    <option value="" selected>لطفا نسخه جدید را انتخاب کنید</option>
+                                {% endif %}
+                            </select>
+                            <button type="submit" class="create-version-btn" id="create-version-btn" disabled>صورت حساب جدید</button>
+                        </form>
+                    {% endif %}
+                {% endif %}
+            {% else %}
+                <p>لطفاً یک شرکت را از لیست انتخاب کنید.</p>
+            {% endif %}
+        </section>
+    </div>
+</body>
+</html>

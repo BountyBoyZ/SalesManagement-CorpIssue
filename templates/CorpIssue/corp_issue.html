@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+     <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/bootstrap.css" >
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/bootstrap.rtl.css" >
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/all.css" >
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/fontawesome.css" >
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/solid.css" >
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/brands.css" >
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/jquery-confirm.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/jquery-ui.css" >
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/jquery-ui.structure.css" >
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/jquery-ui.theme.css" >
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/persian-datepicker.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/style.css" >
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/jquery-confirm.css" >
+    <link href="/static/CorpIssue/FA/Web/css/all.css" rel="stylesheet">
+    <title> لیست موارد غیرقابل پذیرش در صورتحساب </title>
+</head>
+<body>
+
+
+
+    <div class="main-title">
+        <p> لیست موارد غیرقابل پذیرش در صورتحساب </p>
+    </div>
+
+
+{% if not corp_issue_exist %}
+        <h1>متاسفانه فرمی با مشخصات مورد نظر وجود ندارد.</h1>
+    {% else %}
+    <div class="main">
+
+     <div class="col-10 toggle">
+        <input type="button" data="public" class="menu public btn  col-3 text-center selected hidden" value="ارتباط  با مشتری">
+        <input type="button" data="invoice" class="menu invoice btn  col-3 text-center hidden" value="درخواست مربوط به صورتحساب">
+
+     </div>
+
+    <div class="request-frm col-11">
+        <form action="/SalesManagement/CorpIssue/insert-corp-issue/" method="post" name="new-corp-item" onsubmit="return validateForm()" required>
+            <input type="hidden" name="token" value="{{ token }}" id="token" />
+            <input type="hidden" name="username" value="{{ username }}" id="username" />
+            <input type="hidden" name="corp_issue_id" id="corp-issue-id" value="{{ corp_issue_id}}">
+            {% csrf_token %}
+            <div class="row first-row col-11">
+                     <div class="input info date col-4">
+                            <label for=""> تاریخ درخواست  </label>
+                            <input type="text" name="RequestDate"  id="request-date" readonly="readonly" disabled="disabled">
+                            <input type="hidden" name="RequestDate"  id="request-date" >
+
+                    </div>
+                     <div class="active-corp-img col-6">
+                            <img class="corp-issue-img" alt="{{corp_issue.CorpCode}}" data-key="{{corp_issue.CorpCode}}" src="/static/CorpIssue/images/CorpLogo/{{ corp_issue.CorpCode}}.png">
+                     </div>
+                    {% if corp_issue_id %}
+                    <div class="link_new_issue col-2">
+                        <a href="/SalesManagement/CorpIssue/?token={{ request.GET.token }}"><img alt=" ثبت درخواست برای شرکت دیگر" title="ثبت درخواست برای شرکت  دیگر" src="/static/CorpIssue/images/Icon/new_request.png"> </a>
+                        <p> درخواست جدید</p>
+                    </div>
+                    {% endif %}
+
+            </div>
+
+            <div class="row second-row hidden">
+                <div class="col-12 info general-request-fields" >
+                    <div class="request request-for">
+                        <span > درخواست به </span>
+
+                        <div class="request-for-icon">
+                            <img data-val="{{request_for.support}}" class="who support {% if corp_issue.RequestFor == request_for.support %}selected{% endif %}"  alt="پشتیبانی" title="پشتیبانی" src="/static/CorpIssue/images/Icon/support{% if corp_issue.RequestFor != request_for.support %}-Gray{% endif %}.png">
+                            <img data-val="{{request_for.test}}" class="who test {% if corp_issue.RequestFor == request_for.test %}selected{% endif %}"  alt="تست" title="تست"
+                                 src="/static/CorpIssue/images/Icon/tester{% if corp_issue.RequestFor != request_for.test%}-Gray{% endif %}.png">
+                            <img data-val="{{request_for.technical}}" class="who programmer {% if corp_issue.RequestFor == request_for.technical %}selected{% endif %}" alt="تولید" title="تولید" src="/static/CorpIssue/images/Icon/programmer{% if corp_issue.RequestFor != request_for.technical%}-Gray{% endif %}.png">
+                            <input class="request-value" type="hidden" id="request-for" name="request-for" value="" >
+                        </div>
+
+
+                    </div>
+
+                    <div class="request importance">
+                        <span > اهمیت </span>
+                       <div class="star-icons">
+                            <img alt="اهمیت کم" title="اهمیت کم" data-val="{{ importance.importance_low}}" class="star active" src="/static/CorpIssue/images/Icon/star-active.png" />
+                            <img alt="اهمیت متوسط" title="اهمیت متوسط" data-val="{{ importance.importance_normal}}" class="star inactive {% if corp_issue.Importance > importance.importance_low %}active{% endif %}" src="/static/CorpIssue/images/Icon/star{% if corp_issue.Importance > importance.importance_low %}-active{% else %}-inactive{% endif %}.png"/>
+                            <img alt="اهمیت زیاد" title="اهمیت زیاد" data-val="{{ importance.importance_high}}" class="star inactive {% if corp_issue.Importance > importance.importance_normal %}active{% endif %}" src="/static/CorpIssue/images/Icon/star{% if corp_issue.Importance > importance.importance_normal%}-active{% else %}-inactive{% endif %}.png"/>
+                            <input class="importance-value" type="hidden" id="importance" name="importance" value="">
+                        </div>
+
+
+
+
+                    </div>
+
+                    <div class="request urgency">
+                        <span> فوریت </span>
+
+                        <div class="urgency-icon">
+                            <img class="priority {% if corp_issue.Priority == priority.priority_low %}selected{% endif %}" data-val="{{ priority.priority_low}}" alt="درجه فوریت کم" title="درجه فوریت کم" src="/static/CorpIssue/images/Icon/low{% if corp_issue.Priority != priority.priority_low %}-Gray{% endif %}.png">
+                            <img class="priority {% if corp_issue.Priority == priority.priority_normal %}selected{% endif %}" data-val="{{ priority.priority_normal}}" alt="normal" title="درجه فوریت معمولی" src="/static/CorpIssue/images/Icon/normal{% if corp_issue.Priority != priority.priority_normal %}-Gray{% endif %}.png">
+                            <img class="priority {% if corp_issue.Priority == priority.priority_high %}selected{% endif %}" data-val="{{ priority.priority_high}}" alt=" high" title="درجه فوریت بالا" src="/static/CorpIssue/images/Icon/high{% if corp_issue.Priority != priority.priority_high %}-Gray{% endif %}.png">
+                            <input class="urgency-value" type="hidden" id="urgency" name="urgency" value="" >
+                        </div>
+
+                    </div>
+
+
+
+                </div>
+            </div>
+
+             <div class="container-1 col-12">
+                    <div class="version {% if corp_issue.Version %} no-edit {% endif %}" >
+                        {% for version in  versions  %}
+                          <div class="version-num {% if corp_issue.Version == version.Caption %}selected {% endif %}" data-key="{{ version.Caption }}"><div>{{ version.Caption }}</div></div>
+                        {% endfor %}
+                      <input name="version_value" class="version_value" type="hidden" value="">
+
+
+                    </div>
+             </div>
+{#         اگر corp issue جدید داریم درست میکنیم لیست شرکت ها که توی container-3هست بهمون نشون بده در غیر این صورت فقط شرکت بیمه همان corp issue را نشان بده#}
+             {% if  not corp_issue_id %}
+                <div class="container-3  col-12 ">
+                <div class="search ">
+                        <input class="search-input  " name="search-corp" type="text" placeholder=" جستجو شرکت ها ...">
+                </div>
+
+                <div class="left ">
+                <div class="arrow-right"><i class="arrow fa-solid  fa-chevron-right fa-2x"  aria-hidden="true"></i></div>
+                <div class="icons corp" style="overflow-x: scroll;">
+                     {% for corp in corps %}
+                    <div class="company-name" data-key="{{corp.CorpName}}" data-corp-code="{{corp.CorpCode}}">
+
+                        <div class="up"><img class="corp logo {% if corp_issue.CorpCode == corp.CorpCode %}selected{% endif %} " alt="{{corp.CorpName}}" data-key="{{corp.CorpCode}}" src="/static/CorpIssue/images/CorpLogo/{{ corp.CorpCode}}{% if corp_issue.CorpCode != corp.CorpCode %}-Gray{% endif %}.png"></div>
+                        <div class="down" data-key="{{ corp.CorpName }}">{{ corp.CorpName }}</div>
+                    </div>
+                     {% endfor %}
+                    <input class="code" name="corp-code" type="hidden" value="">
+                    <input class="corp-nam" name="corp_name" type="hidden" value="">
+                </div>
+                <div class="arrow-left"><i class="arrow fa-solid  fa-chevron-left fa-2x" aria-hidden="true"></i></div>
+            </div>
+
+        </div>
+             {% endif %}
+
+            {% if corp_issue_id %}
+                <div class="request-row">
+                      <div class="container-labals">
+                            <label class="col-2" > انتخاب تیم  </label>
+                            <label class="col-1" > شماره تسک  </label>
+                            <label class="col-2" > عنوان  </label>
+                            <label class="col-2" >دلیل  </label>
+                            <label class="col-1" >  کار کرد  </label>
+                            <label class="col-3" >شرح  </label>
+                        </div>
+                    <div class="input-container col-12">
+
+
+                     <div class="team-combo col-2">
+                        <select name="teams" id="teams">
+                            <option value="-1">انتخاب تیم</option>
+                                {% for team in teams %}
+                                    <option value="{{ team.TeamCode}}">{{ team.TeamName }}</option>
+                                {% endfor %}
+
+                        </select>
+                        <input class="team-value" name="team_value" value="" type="hidden" >
+                    </div>
+                    <div class=" box-txt task-number col-1" >
+                                <label class="hidden"> شماره تسک  </label>
+                                <input class="text-box" type="number" name="task_number" placeholder="999999" id="">
+
+                     </div>
+                     <div class=" box-txt new-request-title col-2">
+                                <label class="hidden"> عنوان  </label>
+                                <input class="text-box" type="text" name="request_title" placeholder="عنوان" id="">
+
+                     </div>
+                     <div class="box-txt new-request-reason col-2" >
+                                <label class="hidden">دلیل  </label>
+{#                                <input class="text-box" type="text" name="reason"  placeholder="دلیل" id="">#}
+                                <div class="reason-combo">
+                                      <select class="text-box" name="reasons" id="reasons">
+                                        <option value="-1">انتخاب دلیل</option>
+                                            {% for reason in reasons %}
+                                                <option value="{{ reason.Caption }}">{{ reason.Caption }}</option>
+                                            {% endfor %}
+
+                                    </select>
+                                </div>
+
+
+
+                     </div>
+                    <div class=" box-txt new-work-hour col-1" >
+                                <label class="hidden">  کار کرد  </label>
+                                <input class="text-box" type="number" name="work_hour" placeholder="120" id="">
+
+                     </div>
+                    <div class="box-txt new-description col-3">
+                                 <label class="hidden">شرح  </label>
+                                <textarea class="text-box" type="text" name="description" rows="2" cols="40" placeholder="شرح...." id=""></textarea>
+
+
+                        </div>
+{#                    <div class="attach">#}
+{#                        <i title="اضافه کردن فایل" class='fas fa-paperclip'></i>#}
+{#                    </div>#}
+{#                    <div class="file-dialog " id="dialog" title="افزودن فایل">#}
+{#                        <input type="text"  name="file_title" id="file-title" placeholder="موضوع فایل ارسالی...">#}
+{#                        <input type="file" name="attached_file" id="attached-file" >#}
+{#                        <i title="ثبت فایل" class="fa fa-plus-square"></i>#}
+{#                        <i title="انصراف ذخیره فایل" class="fa fa-refresh"></i>#}
+{#                    </div>#}
+                    <div class="submit-new-row ">
+                        <i title="ذخیره" class="fa-sharp fa-solid fa-circle-check"></i>
+                    </div>
+
+
+
+            </div>
+                    {% for each_detail in issue_detail_objects %}
+                        <div class="container-4 col-12" data-detail-id="{{ each_detail.id }}">
+
+                            <div class="team-combo col-1">
+
+                                <img class="new-row-img" alt="" title="" src="/static/CorpIssue/images/team/{{ each_detail.TeamCode}}.png">
+
+                            </div>
+                            <div class=" box request-task-number col-1" >
+                                <input class="text-box hidden" type="number" name="edit_task_number" placeholder="123" id="">
+                                <div class="text-box show-task-number">{{ each_detail.TaskNumber}}</div>
+
+
+                            </div>
+                             <div class=" box request-title col-2">
+                                 <input class="text-box hidden" type="text" name="edit_request_title" placeholder="عنوان" id="">
+                                 <div class="text-box show-title">{{ each_detail.Title}}</div>
+
+                            </div>
+
+                            <div class="box request-reason col-2" >
+
+                                    <select class="text-box hidden " name="edit_reason" id="edit-reason">
+                                        <option value="-1">انتخاب دلیل</option>
+                                            {% for reason in reasons %}
+                                                <option value="{{ reason.Caption }}">{{ reason.Caption }}</option>
+                                            {% endfor %}
+
+                                    </select>
+{#                                <input class="text-box hidden" type="text" name="edit_reason"  placeholder="دلیل" id="">#}
+                                <div class="text-box show-reason">{{ each_detail.Reason }}</div>
+                            </div>
+
+
+                             <div class=" box work-hour col-1" >
+                                <input class="text-box hidden" type="number" name="edit_work_hour" placeholder="کارکرد" id="">
+                                 <div class="text-box show-hour-work">{{ each_detail.WorkHours }}</div>
+                            </div>
+
+
+                            <div class="box description col-3">
+                                <textarea class="text-box hidden edit-description" type="text" name="edit_description" rows="2" cols="40" placeholder="شرح...." id=""></textarea>
+                                <div class="text-box show-description">{{ each_detail.CorpIssueDetailDescription }}</div>
+
+                            </div>
+
+                            <div class="edit-issue" >
+                                <i title="ویرایش" class="fa-sharp fa-solid fa-pen-to-square edit"></i>
+                            </div>
+                            <div class="delete-issue" >
+                                <i  title="حذف" class=" fa-solid fa-trash-can trash" ></i>
+                            </div>
+                             <div class="cancel-edit hidden" >
+                                <i title="لغو تغییرات" class="fa-sharp fa-solid fa-circle-xmark"></i>
+                            </div>
+                            <div class="save-edit hidden" >
+                                <i title=" ذخیره تغییرات" class="fa-sharp fa-solid fa-circle-check"></i>
+                            </div>
+
+
+            </div>
+                    {% endfor %}
+            </div>
+            {% endif %}
+
+{#برای ویرایش خطی که تازه اضافه شده برای ظاهر کردن کومبو دلایل به این کومبو مخفی نیاز داریم لطفا پاک نکن #}
+        <div class="cloner-select">
+            <select class="text-box main-reason hidden " name="edit_reason" id="edit-reason">
+        <option value="-1">انتخاب دلیل</option>
+            {% for reason in reasons %}
+                <option value="{{ reason.Caption }}">{{ reason.Caption }}</option>
+            {% endfor %}
+
+    </select>
+        </div>
+
+        <div class="buttons">
+            <button class="send btn {% if corp_issue_id %}hidden{% endif %} " id="save-corp-issue" type="submit">ذخیره</button>
+            <button class="send btn {% if not corp_issue_id %}hidden{% endif %} " id="start-process" type="button">شروع فرآیند</button>
+           <button class="cancel btn cancel-detail" type="button">انصراف</button>
+        </div>
+     </form>
+    </div>
+    </div>
+{% endif %}
+</body>
+<script src="/static/CorpIssue/js/jquery-3.6.0.min.js"></script>
+<script src="/static/CorpIssue/js/fontawesome.min.js"></script>
+<script src="/static/CorpIssue/js/jquery-confirm.js"></script>
+<script src="/static/CorpIssue/js/jquery-ui.js"></script>
+<script src="/static/CorpIssue/js/fontawesome.js"></script>
+<script src="/static/CorpIssue/js/persian-date.min.js"></script>
+<script src="/static/CorpIssue/js/persian-datepicker.min.js"></script>
+<script src="/static/CorpIssue/js/MyCodeNew.js"></script>
+</html>

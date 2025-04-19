@@ -1,0 +1,162 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدیریت صورت حساب</title>
+    <link rel="stylesheet" href="{% static 'CorpIssue/css/sales_manager_form.css' %}">
+    <link rel="stylesheet" href="{% static 'CorpIssue/fontawesome/css/all.min.css' %}">
+    <script src="{% static 'CorpIssue/js/jquery-3.6.0.min.js' %}"></script>
+    <script src="{% static 'CorpIssue/js/corp_issue.js' %}" defer></script>
+</head>
+<div style="position: fixed; left: 10px; bottom: 5px; z-index: 9999; font-size: 11px; color: #007bff; display: flex; align-items: center; cursor: pointer;">
+    <img src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/faq.png' %}" style="width: 16px; height: 16px; margin-left: 4px;">
+    <a href="{% static help_doc %}" style="color: #007bff; text-decoration: none; font-size: 11px;" download>به کمک نیاز دارید ؟</a>
+</div>
+<body>
+    {% if error %}
+        <div class="container">
+            <div class="error-message">{{ error }}</div>
+            <a href="{% url 'list_corps' %}" class="submit-btn">بازگشت به صفحه اصلی</a>
+        </div>
+    {% else %}
+    <div class="header">
+        <div class="header-right">
+            <div class="logo-container">
+                <img src="{% static 'CorpIssue/images/corp_logo/' %}{{ corp_code }}.png" alt="Logo" class="corp-logo">
+            </div>
+        </div>
+        <div class="header-title">
+            <h1>
+                صورت حساب شرکت {{ corp_name }}
+                {% if invoice.status.code == 'InvoiceStatus_SentToSalesManager' %}
+                    <div class="subtitle">دانلود و ارسال تسک ها برای مشتری</div>
+                {% elif invoice.status.code == 'InvoiceStatus_SentToCustomer' %}
+                    <div class="subtitle">آپلود پاسخ مشتری</div>
+                {% endif %}
+            </h1>
+        </div>
+        <div class="header-left">
+            <a id="help-download-link" href="{% static help_doc %}" download class="help-book-link">
+                <img id="help-book-icon"
+                     src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/book-grey.png' %}"
+                     alt="راهنما"
+                     class="help-book-icon">
+            </a>
+            <span class="version-number" style="margin-right: 10px;">نسخه {{ version_number }}</span>
+        </div>
+    </div>
+        <div class="container">
+            <div class="content-wrapper {% if invoice.status.code == 'InvoiceStatus_ReturnedToProjectManager' %}returned-to-pm-view{% elif invoice.status.code == 'InvoiceStatus_SentToSalesManager' %}sales-manager-view{% else %}customer-view{% endif %}">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>عنوان فایل</th>
+                            <th>تاریخ آخرین وضعیت</th>
+                            <th>وضعیت</th>
+                            <th>دانلود فایل</th>
+                            {% if invoice.status.code == 'InvoiceStatus_SentToCustomer' %}
+                            <th>آپلود فایل</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for invoice in invoices %}
+                        <tr>
+                            <td>صورت حساب نسخه {{ version_number }} بیمه {{ corp_name }}</td>
+                            <td>{{ invoice.updated_at|date:'Y/m/d H:i:s' }}</td>
+                            <td>
+                                <span class="status-pill {{ invoice.status.code }}">
+                                    {% if invoice.status.code == 'InvoiceStatus_SentToSalesManager' %}
+                                        ارسال شده برای مدیر فروش
+                                    {% elif invoice.status.code == 'InvoiceStatus_SentToCustomer' %}
+                                        ارسال شده به مشتری
+                                    {% else %}
+                                        {{ invoice.status.value }}
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <form method="POST" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" name="download" class="download-btn"
+                                        {% if invoice.status.code != 'InvoiceStatus_SentToSalesManager' %}disabled{% endif %}>
+                                        <i class="fas fa-download"></i>
+                                        دانلود
+                                    </button>
+                                </form>
+                            </td>
+                            {% if invoice.status.code == 'InvoiceStatus_SentToCustomer' %}
+                            <td>
+                                <form method="POST" enctype="multipart/form-data" class="file-input-container" data-invoice-id="{{ invoice.id }}">
+                                    {% csrf_token %}
+                                    <button type="button" class="upload-btn" onclick="uploadSelectedFile('{{ invoice.id }}')">
+                                        <i class="fas fa-upload"></i>
+                                        آپلود
+                                    </button>
+                                </form>
+                                <div id="upload-success-{{ invoice.id }}" class="upload-success" style="display: none;"></div>
+                            </td>
+                            {% endif %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                {% if invoice.status.code == 'InvoiceStatus_SentToCustomer' %}
+                <div class="upload-zone-container">
+                    <div class="upload-zone">
+                        <i class="fas fa-cloud-arrow-up"></i>
+                        <p>فایل را برای آپلود به اینجا بکشید</p>
+                        <button class="select-file-btn" onclick="document.getElementById('main_upload_file').click()">
+                            انتخاب فایل
+                        </button>
+                        <p class="file-name"></p>
+                        <form method="POST" enctype="multipart/form-data" class="file-input-container" data-invoice-id="{{ invoice.id }}">
+                            {% csrf_token %}
+                            <input type="file" id="main_upload_file" name="upload_file" accept=".xlsx" style="display: none;">
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+            
+                {% if invoice.status.code == 'InvoiceStatus_SentToCustomer' %}
+                <div class="customer-next-stage-container">
+                    <button class="next-stage-btn customer-next-btn" onclick="showNextStageModal()">
+                        <i class="fas fa-arrow-right"></i>
+                        مرحله بعد
+                    </button>
+                </div>
+                {% endif %}
+                {% if invoice.status.code == 'InvoiceStatus_SentToSalesManager' %}
+                <div class="next-stage-container">
+                    <button class="next-stage-btn" onclick="showNextStageModal()">
+                        <i class="fas fa-arrow-right"></i>
+                        مرحله بعد
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+
+    <div id="next-stage-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeNextStageModal()">&times;</span>
+            <h3>
+                {% if invoice.status.code == 'InvoiceStatus_SentToSalesManager' %}
+                    آیا مایل به ارسال تسک ها برای مشتری هستید؟
+                {% elif invoice.status.code == 'InvoiceStatus_SentToCustomer' %}
+                    آیا از آپلود فایل مطمئن هستید و میخواهید تسک های رد شده را برای مدیران پروژه ارسال کنید؟
+                {% endif %}
+            </h3>
+            <div class="modal-buttons">
+                <button class="confirm-btn" onclick="confirmNextStage('{{ invoice.id }}')">تایید</button>
+                <button class="cancel-btn" onclick="closeNextStageModal()">انصراف</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

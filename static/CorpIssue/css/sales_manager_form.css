@@ -1,0 +1,591 @@
+/* Add font-face declarations at the top */
+@font-face {
+    font-family: 'Vazirmatn-Black';
+    src: url('../font/Vazirmatn-Black.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Vazirmatn-Bold';
+    src: url('../font/Vazirmatn-Bold.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Vazirmatn-ExtraBold';
+    src: url('../font/Vazirmatn-ExtraBold.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Vazirmatn-Light';
+    src: url('../font/Vazirmatn-Light.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Vazirmatn-Medium';
+    src: url('../font/Vazirmatn-Medium.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Vazirmatn-Regular';
+    src: url('../font/Vazirmatn-Regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Vazirmatn-SemiBold';
+    src: url('../font/Vazirmatn-SemiBold.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Vazirmatn-Thin';
+    src: url('../font/Vazirmatn-Thin.ttf') format('truetype');
+}
+
+/* Update base font for all elements */
+* {
+    font-family: 'Vazirmatn-Regular', Arial, sans-serif;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    text-align: right;
+    direction: rtl;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 10px 20px;
+    position: relative;
+}
+
+.header-title h1 {
+    margin: 0;
+    color: #333;
+    text-align: center; /* Ensure the main title remains centered */
+    font-family: 'Vazirmatn-Bold', Arial, sans-serif;
+}
+
+.header-title .subtitle {
+    font-size: 0.5em; /* Even smaller font size */
+    color: #000; /* Black color */
+    margin-top: 3px; /* Slightly less top margin */
+    display: block; /* Make it a block-level element to appear on a new line */
+    font-weight: normal;
+    font-family: 'Vazirmatn-Medium', Arial, sans-serif;
+}
+
+.header-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.header-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.corp-logo {
+    width: 110px;
+    height: auto;
+    margin-left: 10px;
+}
+
+.version-number {
+    color: #666;
+    font-size: 1.4em;
+    font-family: 'Vazirmatn-Medium', Arial, sans-serif;
+    margin-right: 38px; /* 28px icon + 10px gap */
+    position: static;
+}
+
+.header-title {
+    flex-grow: 1;
+    text-align: center;
+}
+
+.container {
+    width: 85%;
+    margin: 0 auto;
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative; /* Ensure absolute children are positioned relative to container */
+}
+
+/* Add new content wrapper styles */
+.content-wrapper {
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+}
+
+table {
+    width: 65%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 0.9em; /* Making table content smaller */
+    height: 10px;
+}
+
+th, td {
+    padding: 8px; /* Reduced from 10px */
+    border: none; /* Removed borders */
+    text-align: center;
+}
+
+th {
+    background-color: #f8f9fa;
+    color: #495057;
+    font-weight: 600;
+    border-bottom: 2px solid #dee2e6; /* Added bottom border for header */
+    font-family: 'Vazirmatn-SemiBold', Arial, sans-serif;
+}
+
+tr {
+    border-bottom: 1px solid #dee2e6; /* Light border between rows */
+    transition: background-color 0.2s ease; /* Smooth transition for hover effect */
+}
+
+tr:hover {
+    background-color: #a9a9b8 !important; /* Light highlight on hover */
+}
+
+.status-pill {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 15px;
+    color: white;
+    background-color: #007bff;
+    font-weight: bold;
+    font-size: 0.9em;
+    font-family: 'Vazirmatn-Medium', Arial, sans-serif;
+}
+.status-approved {
+    background-color: green;
+}
+
+.status-approved-pm {
+    background-color: #007bff;
+}
+
+.status-rejected {
+    background-color: red;
+}
+
+.status-pending {
+    background-color: orange;
+}
+
+.status-returned {
+    background-color: yellow;
+}
+
+.status-other {
+    background-color: gray;
+}
+
+.submit-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    font-family: 'Vazirmatn-Medium', Arial, sans-serif;
+}
+
+submit-btn:hover {
+    background-color: #0056b3;
+}
+
+.success-message {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 10px;
+    border: 1px solid #c3e6cb;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+/* Remove search bar styles from this page */
+.header-right .search-bar {
+    display: none;
+}
+
+.file-input-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.file-input-container input[type="file"] {
+    flex: 1;
+    padding: 5px;
+}
+
+/* Update upload zone styles to take remaining width */
+.upload-zone-container {
+    display: none;
+    width: 35%; /* Takes the remaining width when table is 65% */
+}
+
+.upload-zone {
+    height: 300px;
+    border: 3px dashed #ccc;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+    width: 100%; /* Make it fill its container */
+}
+
+.upload-zone[data-disabled="true"] {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.upload-zone i {
+    font-size: 48px;
+    color: #007bff;
+    margin-bottom: 15px;
+}
+
+.upload-zone p {
+    text-align: center;
+    color: #666;
+    margin: 10px 0;
+    font-family: 'Vazirmatn-Regular', Arial, sans-serif;
+}
+
+.upload-zone .file-name {
+    margin-top: 10px;
+    color: #28a745;
+    display: none;
+    font-family: 'Vazirmatn-Regular', Arial, sans-serif;
+}
+
+/* Update button styles */
+.download-btn, .upload-btn {
+    min-width: 120px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-family: 'Vazirmatn-Medium', Arial, sans-serif;
+}
+
+.download-btn {
+    background-color: #28a745;
+    color: white;
+}
+
+.download-btn:hover {
+    background-color: #218838;
+}
+.upload-btn {
+    min-width: 120px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    background-color: rgba(0, 123, 255, 0.7);
+    color: white;
+}
+
+.upload-btn:hover {
+    background-color: rgba(0, 123, 255, 0.9);
+}
+
+.upload-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Add upload success message */
+.upload-success {
+    color: #28a745;
+    margin-top: 10px;
+    text-align: center;
+    font-weight: bold;
+    font-family: 'Vazirmatn-Medium', Arial, sans-serif;
+}
+
+/* Add styles for the upload zone file select button */
+.select-file-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 8px 20px;
+    border: none;
+    border-radius: 20px; /* Make it pill shaped */
+    cursor: pointer;
+    margin-top: 15px;
+    font-size: 0.9em;
+    transition: background-color 0.3s;
+    font-family: 'Vazirmatn-Medium', Arial, sans-serif;
+}
+
+.select-file-btn:hover {
+    background-color: #0056b3;
+}
+
+.uploaded-file {
+    color: #666;
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+.file-input-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.file-input-container input[type="file"] {
+    display: none;
+}
+
+/* Add these new styles */
+.next-stage-container {
+    text-align: right;
+    margin-top: 20px;
+}
+
+.next-stage-btn {
+    background-color: #28a745;
+    color: white;
+    padding: 8px 20px; /* Reduced height */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: 200px; /* Make it wider */
+    justify-content: center;
+    margin-top: 20px;
+    font-family: 'Vazirmatn-Medium', Arial, sans-serif;
+}
+
+.next-stage-btn:hover {
+    background-color: #218838;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 5px;
+    width: 400px;
+    text-align: center;
+    position: relative;
+    font-family: 'Vazirmatn-Regular', Arial, sans-serif;
+}
+
+.modal-content h3 {
+    font-family: 'Vazirmatn-Bold', Arial, sans-serif;
+}
+
+.close {
+    position: absolute;
+    right: 10px;
+    top: 5px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.confirm-btn {
+    background-color: #28a745;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Vazirmatn-Medium', Arial, sans-serif;
+}
+
+.cancel-btn {
+    background-color: #dc3545;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Vazirmatn-Medium', Arial, sans-serif;
+}
+
+.confirm-btn:hover {
+    background-color: #218838;
+}
+
+.cancel-btn:hover {
+    background-color: #c82333;
+}
+
+/* Update table width based on status */
+.content-wrapper {
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+}
+
+/* Update content wrapper styles */
+.content-wrapper.sales-manager-view {
+    display: block; /* Remove flex when in sales manager view */
+}
+
+.content-wrapper.customer-view {
+    display: flex;
+    gap: 20px;
+}
+
+.content-wrapper.customer-view table {
+    width: 65%;
+}
+
+.content-wrapper.customer-view .upload-zone-container {
+    display: block;
+    width: 35%; /* Takes the remaining width */
+}
+
+.content-wrapper.sales-manager-view .upload-zone-container,
+.content-wrapper.sales-manager-view .file-input-container {
+    display: none; /* Hide upload elements in sales manager view */
+}
+
+.content-wrapper.sales-manager-view table {
+    width: 100%;
+}
+
+/* Styles to hide the "دانلود فایل" column and adjust widths in customer view */
+.content-wrapper.customer-view table thead tr th:nth-child(4),
+.content-wrapper.customer-view table tbody tr td:nth-child(4) {
+    display: none;
+}
+
+.content-wrapper.customer-view table thead tr th:nth-child(1), /* عنوان فایل */
+.content-wrapper.customer-view table tbody tr td:nth-child(1) {
+    width: 40%; /* Adjust as needed */
+}
+
+.content-wrapper.customer-view table thead tr th:nth-child(2), /* تاریخ آخرین وضعیت */
+.content-wrapper.customer-view table tbody tr td:nth-child(2) {
+    width: 30%; /* Adjust as needed */
+}
+
+.content-wrapper.customer-view table thead tr th:nth-child(3), /* وضعیت */
+.content-wrapper.customer-view table tbody tr td:nth-child(3) {
+    width: 30%; /* Adjust as needed */
+}
+
+/* If the "آپلود فایل" column is present in the customer view, adjust its width */
+.content-wrapper.customer-view table thead tr th:nth-child(5),
+.content-wrapper.customer-view table tbody tr td:nth-child(5) {
+    width: auto; /* Or a specific percentage if needed */
+}
+
+.content-wrapper.returned-to-pm-view .file-input-container,
+.content-wrapper.returned-to-pm-view .upload-zone-container,
+.content-wrapper.returned-to-pm-view .customer-next-stage-container,
+.content-wrapper.returned-to-pm-view .next-stage-container {
+    display: none !important;
+}
+.content-wrapper.returned-to-pm-view table thead tr th:nth-child(4),
+.content-wrapper.returned-to-pm-view table tbody tr td:nth-child(4),
+.content-wrapper.returned-to-pm-view table thead tr th:nth-child(5),
+.content-wrapper.returned-to-pm-view table tbody tr td:nth-child(5) {
+    display: none !important;
+}
+
+.customer-next-stage-container {
+    position: absolute;
+    bottom: 30px;
+    right: 40px;
+    z-index: 10;
+}
+
+.content-wrapper.returned-to-pm-view {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+}
+
+.content-wrapper.returned-to-pm-view table {
+    width: 60%;
+    margin: 0 auto;
+}
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+}
+.help-book-icon {
+    width: 28px;
+    height: 28px;
+    vertical-align: middle;
+}

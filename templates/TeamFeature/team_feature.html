@@ -1,0 +1,184 @@
+<html dir="rtl" lang="fa-IR">
+{% load tag_liberary %}
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="/static/TeamFeature/css/bootstrap.css" >
+    <link rel="stylesheet" type="text/css" href="/static/TeamFeature/css/jquery-confirm.min.css" >
+    <link rel="stylesheet" type="text/css" href="/static/TeamFeature/css/bootstrap.rtl.css" >
+    <link rel="stylesheet" type="text/css" href="/static/TeamFeature/css/fontawesome.min.css" >
+    <link rel="stylesheet" type="text/css" href="/static/TeamFeature/css/style.css" >
+    <title>وضعیت قابلیتهای تیم ها در شرکت ها</title>
+</head>
+<body>
+    <div class="team_feature_page">
+    <div class="new-version-team-info">
+        <div class="new-version">
+            <a href="/TeamFeature/feature-view/"> <img atr="old version" title="old version"
+                                          src="/static/TeamFeature/images/icon/old-version.png"></a>
+            <p>نسخه جدید </p>
+        </div>
+        <div class="team-info">
+
+            <p>
+                <a href="/static/TeamFeature/file/GEN.QUGU.TCFS.EIT.02.pdf" target="_blank">
+                    <img class="help" src="/static/TeamFeature/images/icon/help.png" alt="جهت دانلود راهنما کلیک کنید" title="جهت دانلود راهنما کلیک کنید">
+                </a>
+            </p>
+            {% for t in obj_team %}
+                <img src="/static/TeamFeature/images/team/{{ t.TeamCode}}.png" alt="{{ t.TeamName }}"
+                     title="{{ t.TeamName }}" class="logo {{ t.TeamCode }} {% if t.TeamCode != team %}hidden{% endif %}">
+            {% endfor %}
+            <br>
+            <div class="mt-3 mb-5 mx-6 justify-content-between team-info combo col-3">
+            {% if has_more_than_one_team %}
+                <form method="post" name="frm_user_team">
+                 {% csrf_token %}
+                    <select name="team_selected" id="team_selected">
+                    {% for t in obj_team %}
+                        <option value="{{ t.TeamCode}}" {% if  t.TeamCode == team %}selected{% endif %}>
+                            {{ t.TeamName }}
+                        </option>
+                    {% endfor %}
+                    </select>
+                    <button type="submit" class="hidden" ></button>
+                </form>
+                {% else %}
+                {% for team in obj_team %}
+                    <span>{{ team.TeamName }}</span>
+                {% endfor %}
+             {% endif %}
+            </div>
+        </div>
+    </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th colspan="2" rowspan="2">
+                        <input type="text" class="feature-filter" name="feature-filter" placeholder="عنوان قابلیت را وارد کنید" />
+                        <img src="/static/TeamFeature/images/icon/filter.png" alt="برای فیلتر کردن عبارت را وارد کنید"
+                        title="برای فیلتر کردن عبارت را وارد کنید" class="icon filter"/>
+                    </th>
+                    {% for corp in obj_corp %}
+                        <th>
+                            <img src="/static/TeamFeature/images/corp/{{ corp.CorpCode }}.png"
+                                 alt="{{ corp.CorpName }}"  title="{{ corp.CorpName }}"
+                                 class="corp" data-key="{{ corp.CorpCode }}"/>
+                        </th>
+                    {% endfor %}
+                </tr>
+                <tr>
+
+                    {% for corp in obj_corp %}
+                        <th>
+                            <img src="/static/TeamFeature/images/icon/all-feature.png"
+                                 alt="برای فعال کردن تمامی قابلیتها برای این شرکت، کلیک کنید"
+                                 title="برای فعال کردن تمامی قابلیتها برای این شرکت، کلیک کنید" class="icon active all"
+                                 data-corp="{{ corp.CorpCode }}" data-feature="ALL"/>
+                            <br/>
+                            <input type="number" min="1380" max="1401" name="{{ corp.CorpCode }}-ALL" class="year-no all"  value="1400"
+                                   data-corp="{{ corp.CorpCode }}" data-feature="ALL"/>
+                        </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {%  for obj in team_corp_feature_list %}
+                <tr data-key="{{ obj.feature.FeatureCode }}">
+                    <td>
+                        <div class="feature-text" data-key="{{ obj.feature.FeatureCode }}" title="{{ obj.feature.Feature }}">
+                            <div>
+                                <div class="feature-code">
+                                    {{ obj.feature.FeatureCode }}
+                                </div>
+                            </div>
+                            <div>
+                                <img src="/static/TeamFeature/images/icon/star-active.png" class="star active"
+                                     data-key="{{ obj.feature.FeatureCode }}" data-val="1"
+                                     alt="درجه اهمیت متوسط" title="درجه اهمیت متوسط"/>
+                                <img src="/static/TeamFeature/images/icon/star-{% if obj.feature.Importance < 2 %}in{% endif %}active.png"
+                                     class="star {% if obj.feature.Importance < 2 %}in{% endif %}active"
+                                     data-key="{{ obj.feature.FeatureCode }}" data-val="2"
+                                     alt="درجه اهمیت زیاد" title="درجه اهمیت زیاد"/>
+                                <img src="/static/TeamFeature/images/icon/star-{% if obj.feature.Importance < 3 %}in{% endif %}active.png"
+                                     class="star {% if obj.feature.Importance < 3 %}in{% endif %}active"
+                                     data-key="{{ obj.feature.FeatureCode }}" data-val="3"
+                                     alt="درجه اهمیت خیلی زیاد" title="درجه اهمیت خیلی زیاد"/>
+                            </div>
+                            <div class="feature-text-place">
+                                <span data-key="{{ obj.feature.FeatureCode }}">{{ obj.feature.Feature }}</span>
+                                <textarea name="{{ obj.feature.FeatureCode }}" cols="14" rows="5" class="hidden feature-text-edit" >{{ obj.feature.Feature }}</textarea>
+                            </div>
+                            <div class="feature-icon-place">
+                                <img src="/static/TeamFeature/images/icon/edit.png" alt="جهت ویرایش کلیک کنید" title="جهت ویرایش کلیک کنید"
+                                class="feature-icon edit" data-key="{{ obj.feature.FeatureCode }}"/>
+                                <img src="/static/TeamFeature/images/icon/delete.png" alt="جهت حذف کلیک کنید" title="جهت حذف کلیک کنید"
+                                class="feature-icon delete" data-key="{{ obj.feature.FeatureCode }}"/>
+                                <img src="/static/TeamFeature/images/icon/save.png" alt="جهت ثبت کلیک کنید" title="جهت ثبت کلیک کنید"
+                                class="feature-icon save hidden" data-key="{{ obj.feature.FeatureCode }}"/>
+                                <img src="/static/TeamFeature/images/icon/cancel.png" alt="جهت لغو تغییرات کلیک کنید" title="جهت لغو تغییرات کلیک کنید"
+                                class="feature-icon cancel hidden" data-key="{{ obj.feature.FeatureCode }}"/>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <img src="/static/TeamFeature/images/icon/all-corp.png"
+                             alt="برای فعال کردن این قابلیت برای تمامی شرکت ها کلیک کنید"
+                             title="برای فعال کردن این قابلیت برای تمامی شرکت ها کلیک کنید" class="icon inactive all"
+                             data-corp="ALL" data-feature="{{ obj.feature.FeatureCode }}"/>
+                        <br/>
+                        <input type="number" min="1380" max="1401" name="{{ obj.feature.FeatureCode }}-ALL" class="year-no all" value="1400"
+                             data-corp="ALL" data-feature="{{ obj.feature.FeatureCode }}"/>
+                    </td>
+                    {% for corp_feature in obj.list %}
+                    <td>
+                        <img src="/static/TeamFeature/images/icon/{{corp_feature.image_name }}.png" alt="{{ corp_feature.alt }}"
+                             title="{{ corp_feature.alt }}" class="icon {{corp_feature.image_name  }} "
+                             data-corp="{{ corp_feature.corp.CorpCode }}" data-feature="{{ obj.feature.FeatureCode }}"/>
+                        <br/>
+                        <input type="number" min="1380" max="1401" name="{{ corp_feature.corp.CorpCode }}-{{ obj.feature.FeatureCode }}"
+                               class="year-no {{corp_feature.image_name }}" value="{{ corp_feature.year_no }}"
+                             data-corp="{{ corp_feature.corp.CorpCode }}" data-feature="{{ obj.feature.FeatureCode }}"/>
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="feature-add">
+            <div class="feature-add-icon">
+                <img src="/static/TeamFeature/images/icon/add.png" alt="جهت افزودن قابلیت جدید کلیک کنید"
+                     title="جهت افزودن قابلیت جدید کلیک کنید" class="icon add"/>
+                <span>افزودن قابلیت جدید</span>
+            </div>
+            <div class="hidden feature-add-form">
+                <form name="frm-feature-add" method="post">
+                    <input name="team-code" type="hidden" value="{{ team }}">
+                    {% csrf_token %}
+                    <button type="submit" class="hidden"></button>
+                    <label for="feature">عنوان</label>
+                    <input name="feature" type="text" placeholder="عنوان را وارد کنید"/>
+                    <br/>
+                    <label for="year-number">سال</label>
+                    <input name="year-number" type="number"  value="1400"/>
+                    <label for="order">ترتیب</label>
+                    <input name="order" type="number" value="1"/>
+                    <br/>
+                    <div class="action-icon">
+                        <img src="/static/TeamFeature/images/icon/save.png" alt="جهت ثبت کلیک کنید" title="جهت ثبت کلیک کنید"
+                        class="icon save"/>
+                        <img src="/static/TeamFeature/images/icon/cancel.png" alt="جهت لغو عملیات کلیک کنید"
+                             title="جهت لغو عملیات کلیک کنید" class="cancel icon"/>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+<script src="/static/TeamFeature/js/jquery-3.6.0.min.js"></script>
+<script src="/static/TeamFeature/js/jquery-confirm.min.js"></script>
+<script src="/static/TeamFeature/js/fontawesome.min.js"></script>
+<script src="/static/TeamFeature/js/MyCode.js"></script>
+</html>

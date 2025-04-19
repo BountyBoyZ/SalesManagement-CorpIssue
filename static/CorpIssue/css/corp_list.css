@@ -1,0 +1,257 @@
+/* Add font faces at the top of the file */
+@font-face {
+    font-family: 'Vazirmatn-Black';
+    src: url('../font/Vazirmatn-Black.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Vazirmatn-Bold';
+    src: url('../font/Vazirmatn-Bold.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Vazirmatn-Regular';
+    src: url('../font/Vazirmatn-Regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Vazirmatn-Medium';
+    src: url('../font/Vazirmatn-Medium.ttf') format('truetype');
+}
+
+/* General Styling */
+body {
+    font-family: 'Vazirmatn-Regular', Arial, sans-serif;
+    text-align: right;
+    direction: rtl;
+    margin: 0;
+    padding: 20px;
+    background-color: #f9f9f9;
+}
+
+h1, h2, h3 {
+    font-family: 'Vazirmatn-Bold', Arial, sans-serif;
+    color: #3C3C3C;
+}
+
+/* Layout: Corp List (Left) and Status (Right) */
+.container {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    justify-content: space-between;
+}
+
+/* Left Section: Corp List */
+.corp-section {
+    width: 40%;
+    padding: 20px;
+    border-right: 2px solid #ccc;
+    background-color: white;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.corp-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 5 columns */
+    gap: 15px;
+    justify-content: center;
+    padding-bottom: 20px;
+}
+
+.corp-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0;
+    text-decoration: none;
+    width: 75px;
+    height: 75px;
+    border-radius: 8px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    padding: 5px;
+    overflow: hidden;
+    transition: background-color 0.3s;
+}
+
+.corp-item:hover {
+    background-color: #7961e25c;
+}
+
+.corp-item img {
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+    max-width: 45px;
+    max-height: 45px;
+    transition: filter 0.3s;
+}
+
+/* Selected Corp */
+.corp-item.selected {
+    background-color: #7961e25c;
+    font-family: 'Vazirmatn-Medium', Arial, sans-serif;
+}
+
+.corp-item.selected img {
+    filter: none;
+}
+
+/* Right Section: Status Section */
+.status-section {
+    width: 60%;
+    font-family: 'Vazirmatn-Medium', Arial, sans-serif;
+    padding: 20px;
+    background-color: white;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    text-align: center;
+}
+
+.status-section p, .status-section h2 {
+    margin: 10px 0;
+}
+
+/* Large Corp Logo */
+.corp-logo-large {
+    width: 200px;
+    height: auto;
+    margin: 20px 0;
+    object-fit: contain;
+}
+
+/* Status Badges */
+.status-badge {
+    font-family: 'Vazirmatn-Medium', Arial, sans-serif;
+    display: inline-block;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    color: white;
+}
+
+/* Specific Status Colors */
+.status-open {
+    background-color: #28a745; /* Green */
+}
+
+.status-closed {
+    background-color: #dc3545; /* Red */
+}
+
+.status-under-review {
+    background-color: #ffc107; /* Yellow */
+}
+
+.status-other {
+    background-color: #6c757d; /* Grayish color for other statuses */
+}
+
+/* Show exact status text if it's neither open nor closed */
+.status-other::after {
+    content: attr(data-status); /* Display the actual status */
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+/* Add these new status colors */
+.status-sales-manager {
+    background-color: #007bff; /* Blue */
+}
+
+.status-customer {
+    background-color: #17a2b8; /* Cyan */
+}
+
+/* Create New Version Button */
+.create-version-btn {
+    display: inline-block;
+    font-family: 'Vazirmatn-Medium', Arial, sans-serif;
+    padding: 10px 20px;
+    background-color: #007bff; /* Blue color */
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    transform: scale(1);
+}
+
+.create-version-btn:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+    transform: scale(1.1); /* Uniformly scale the button */
+}
+
+/* Version Select Dropdown */
+.version-select {
+    font-family: 'Vazirmatn-Medium', Arial, sans-serif;
+    width: 150px; /* Adjust width to fit the largest version number */
+    text-align: center; /* Center the text */
+    padding: 5px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.success-text {
+    font-family: 'Vazirmatn-Medium', Arial, sans-serif;
+    color: #28a745;
+    font-size: 14px;
+    margin-top: 5px;
+    font-weight: bold;
+}
+
+.help-book-link {
+    position: static !important;
+    margin: 0 !important;
+    padding: 0;
+}
+
+.help-book-icon {
+    width: 32px;
+    height: 32px;
+    vertical-align: middle;
+}
+
+/* Header Section */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding-bottom: 20px;
+    box-sizing: border-box;
+}
+.header-right {
+    display: flex;
+    justify-content: flex-start;
+}
+.header-right h1 {
+    margin: 0;
+    font-size: 2rem;
+    font-family: 'Vazirmatn-Bold', Arial, sans-serif;
+    color: #3C3C3C;
+}
+
+
+.header-title {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end; /* right in RTL */
+    align-items: center;
+}
+
+.header-title h1 {
+    margin: 0;
+    font-size: 2rem;
+    font-family: 'Vazirmatn-Bold', Arial, sans-serif;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}

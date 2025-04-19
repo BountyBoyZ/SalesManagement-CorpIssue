@@ -1,0 +1,112 @@
+
+
+{% extends 'TeamFeature/base.html' %}
+    {% block main_content %}
+        <input id="token" type="hidden" value="{{token}}">
+
+        <div class="main-content corp-view">
+             <div class="col-6 general-search-box">
+                 <img class="search-img" src="/static/TeamFeature/images/icon/search.svg">
+                <input class="search-input" type="text" placeholder="جستجو شرکت ها ....">
+            </div>
+            {% for corp in team_corp_feature_list %}
+            <div class="corp main-row" data-key="{{ corp.corp_code }}">
+            <div class=" col-12 title-icon" data-corp-name="{{ corp.corp_name }}">
+                <div class=" col-10 title " >
+
+
+                    <div class="little-arrow" href="#">
+                            <i class="fa fa-caret-down rotate fa-1x" aria-hidden="true"></i>
+
+{#                        <span class="up hide">Ù</span> <span class="down">Ú</span>#}
+                    </div>
+
+                    <div class="col-4 corp-name"><h4> {{ corp.corp_name }}</h4></div>
+                    <div class="col-5 item-count">
+                        <span class="inactive-item-count">{{ corp.inactive_feature_count }}مورد غیر فعال </span>
+                        <span class="active-item-count" >{{ corp.active_feature_count }}مورد فعال</span>
+                    </div>
+                </div>
+                <div class="col-2 corp-img" data-key="{{ corp.corp_code }}">
+                    <img alt="{{ corp.corp_name }}" title="{{ corp.corp_name }}"
+                         src='/static/TeamFeature/images/corp_new/{{ corp.corp_code }}.png'>
+                </div>
+            </div>
+
+
+                <div class="situation-box " style="display:none;">
+
+                    <div class="col-5 panel active">
+                        <div class="col-12 panel-title">
+                            <div class="col-6 status">
+                                 <img  class="status-icon" src="/static/TeamFeature/images/icon/Active1.png">
+                                فعال
+                            </div>
+                            <div class="col-6 case-count" data-key="{{ corp.active_feature_count }}">{{ corp.active_feature_count }} مورد</div>
+                        </div>
+                        <div class="col-12 panel-search">
+                                    <div class="col-6 btn-all"  >انتخاب همه</div>
+                                    <div class="col-6 search-box">
+                                       <input class="search-input" type="text" placeholder="جستجو...">
+                                        <img class="search-img" src="/static/TeamFeature/images/icon/search.svg">
+                                    </div>
+
+
+                        </div>
+                        <div class="col-12 panel-body">
+                            <table class="col-12" >
+                                {% for feature in corp.active_feature %}
+                                <tr data-key="{{feature.code }}" data-feature-title="{{ feature.title }}">
+                                    <td><input class="select" data-key="{{ feature.code }}" type="checkbox" name="feature_select "></td>
+                                    <td class=" feature-title" data-year-number="{{ feature.year_number }}"> {{ feature.title }}</td>
+                                    <td ><input class="active-year"  type="number" value="{{ feature.year_number }}" name="active_year" data-key="{{ feature.code }}"></td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-2 operation">
+
+                            <p> فعال سازی </p>
+                            <img title=" arrow" alt="arrow" src="/static/TeamFeature/images/icon/arrow.png">
+
+
+                    </div>
+                    <div class="col-5 panel inactive">
+                        <div class=" col-12 panel-title ">
+                            <div class="col-6 status">
+                                <img  class="status-icon" src="/static/TeamFeature/images/icon/inactive-icon-8.jpg">
+                                 غیرفعال
+                            </div>
+                            <span class="col-6 case-count" data-key="{{ corp.inactive_feature_count }}">{{ corp.inactive_feature_count }} مورد</span>
+                        </div>
+
+                       <div class="col-12 panel-search">
+                           <div class="col-6 btn-all" >انتخاب همه</div>
+                            <div class="col-6 search-box">
+                                <input class="search-input" type="search" placeholder="جستجو...">
+                                <img class="search-img" src="/static/TeamFeature/images/icon/search.svg">
+
+                            </div>
+
+                       </div>
+                       <div class="panel-body ">
+                            <table class="col-12">
+                                {% for feature in corp.inactive_feature %}
+                                <tr data-key="{{feature.code }}" data-feature-title="{{ feature.title }}">
+                                    <td><input class="select " data-key="{{ feature.code }}" type="checkbox" name="feature_select "></td>
+                                    <td class=" feature-title" data-year-number="{{ feature.year_number }}"> {{ feature.title }}</td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                       </div>
+                    </div>
+
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+
+   {% endblock %}
+
+

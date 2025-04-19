@@ -1,0 +1,1525 @@
+/* First, let's define all the font faces */
+@font-face {
+    font-family: 'Vazirmatn-Black';
+    src: url('../font/Vazirmatn-Black.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Vazirmatn-Bold';
+    src: url('../font/Vazirmatn-Bold.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Vazirmatn-ExtraBold';
+    src: url('../font/Vazirmatn-ExtraBold.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Vazirmatn-Light';
+    src: url('../font/Vazirmatn-Light.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Vazirmatn-Medium';
+    src: url('../font/Vazirmatn-Medium.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Vazirmatn-Regular';
+    src: url('../font/Vazirmatn-Regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Vazirmatn-SemiBold';
+    src: url('../font/Vazirmatn-SemiBold.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Vazirmatn-Thin';
+    src: url('../font/Vazirmatn-Thin.ttf') format('truetype');
+}
+
+.main-wrapper {
+    width: 95%;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    min-height: calc(100vh - 150px);
+}
+
+body {
+    font-family: 'Vazirmatn-Regular', Arial, sans-serif;
+    text-align: right;
+    direction: rtl;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+}
+
+/* Header styles */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2px;
+    margin-bottom: 2px;
+    background: none; /* Remove white background */
+    box-shadow: none; /* Remove any shadow */
+    border: none; /* Remove any border */
+}
+
+.header-title-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.header-title {
+    font-size: 1.8em;
+    color: #3C3C3C;
+    margin: 0;
+    font-weight: bold;
+    text-align: right;
+    font-family: 'Vazirmatn-Bold', Arial, sans-serif;
+}
+
+.header-subtitle {
+    font-size: 0.9em;
+    color: #3C3C3C;
+    font-weight: normal;
+    margin: 0;
+    padding-right: 2px; /* Align with title */
+    align-self: flex-start; /* Align with start of title */
+    margin-right: 0; /* Remove any right margin */
+    margin-left: auto; /* Push to right in RTL context */
+    font-family: 'Vazirmatn-Regular', Arial, sans-serif;
+}
+
+.header-right {
+    flex: 1;
+    text-align: right;
+}
+
+.corp-logo {
+    width: 80px;
+    height: auto;
+}
+
+.header-center {
+    flex: 2;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    margin-left: 180px; /* Change this from margin-right to margin-left */
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.version-number {
+    color: #666;
+    font-size: 1.2em;
+}
+
+.container {
+    position: relative;
+    width: 100%;
+    margin-top: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+    font-size: 0.9em;
+    background-color: white;
+    font-family: 'Vazirmatn-Regular', Arial, sans-serif;
+}
+
+th, td {
+    padding: 8px;  /* Reduced from 10px */
+    border: none;  /* Removed borders */
+    text-align: center;
+    vertical-align: middle;
+}
+
+th {
+    background-color: #f8f9fa;
+    color: #3C3C3C;
+    font-weight: 600;
+    border-bottom: 2px solid #dee2e6;  /* Added bottom border for header */
+    font-family: 'Vazirmatn-SemiBold', Arial, sans-serif;
+}
+
+td {
+    font-family: 'Vazirmatn-Regular', Arial, sans-serif;
+    color: #3C3C3C;
+}
+
+tr {
+    border-bottom: 1px solid #dee2e6;  /* Light border between rows */
+    transition: background-color 0.2s ease;  /* Smooth transition for hover effect */
+}
+
+tr:nth-child(odd) {
+    background-color: #F9FAFB;
+}
+
+tr:hover {
+    background-color: #a9a9b8 !important;  /* Light highlight on hover */
+}
+
+.table-team-icon:hover {
+    transform: scale(1.2);
+}
+
+.table-team-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    object-fit: contain;
+    vertical-align: middle;
+    transition: transform 0.2s ease;
+}
+
+.table-team-icon:hover {
+    transform: scale(1.2);
+}
+
+.status-icon:hover {
+    transform: scale(1.1);
+}
+
+.status-icon-tooltip::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1000;
+}
+.status-icon-tooltip:hover::after {
+    visibility: visible;
+    opacity: 1;
+}
+/* Custom tooltip styles */
+.status-icon-tooltip {
+    position: relative;
+    display: inline-block;
+}
+td .status-icon-tooltip img {
+    width: 24px;
+    height: 24px;
+}
+
+.status-icon {
+    width: 24px;      /* Make consistent with other icons */
+    height: 24px;     /* Make consistent with other icons */
+    transition: all 0.3s ease;
+    position: relative;
+    cursor: help;
+    object-fit: contain; /* Ensure icon maintains aspect ratio */
+}
+
+.status-pill {
+    display: inline-block;
+    padding: 4px 8px;  /* Slightly smaller padding */
+    border-radius: 12px;
+    color: white;
+    font-weight: bold;
+    font-size: 0.85em;  /* Smaller font size */
+    font-family: 'Vazirmatn-Medium', Arial, sans-serif;
+}
+
+.status-approved {
+    background-color: green;
+}
+
+.status-approved-pm {
+    background-color: #007bff;
+}
+
+.status-rejected {
+    background-color: red;
+}
+
+.status-pending {
+    background-color: orange;
+}
+
+.status-returned {
+    background-color: yellow;
+}
+
+.status-other {
+    background-color: gray;
+}
+
+.approve-btn, .reject-btn {
+    background: none;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.action-icon {
+    width: 15px;
+    height: 15px;
+    transition: all 0.3s ease;
+}
+
+/* Hover states for icons */
+.approve-btn:hover .approve-icon {
+    content: url('../images/InvoiceTaskForm Icons/icons V/tick-hover.png');
+}
+.approve-btn.selected .approve-icon {
+    content: url('../images/InvoiceTaskForm Icons/icons V/tick.png');
+}
+
+.reject-btn:hover .reject-icon {
+    content: url('../images/InvoiceTaskForm Icons/icons V/cross-hover.png');
+}
+.reject-btn.selected .reject-icon {
+    content: url('../images/InvoiceTaskForm Icons/icons V/cross.png');
+}
+
+.rejection-reason {
+    display: inline-block;
+    width: auto;
+    max-width: 200px; /* Adjust this value to make it longer */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+}
+
+#rejection-reason, #rejection-explanation {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-family: 'Vazirmatn-Regular', Arial, sans-serif;
+    color: #BEBEBE;
+}
+
+#rejection-explanation {
+    height: 100px;
+    resize: vertical;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.modal-content label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-family: 'Vazirmatn-Medium', Arial, sans-serif;
+    color: #3C3C3C;
+}
+
+.info-btn {
+    background-color: blue;
+    color: white;
+    border: none;
+    border-radius: 50%; /* Make it a perfect circle */
+    cursor: pointer;
+    padding: 5px;
+    width: 24px; /* Ensure width and height are equal */
+    height: 24px; /* Ensure width and height are equal */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 5px; /* Add some space between the text and the button */
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000; /* Increased to be above everything */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+    padding-top: 60px;
+}
+
+.modal-content {
+    position: relative;
+    z-index: 1001; /* Higher than modal background */
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 50%;
+    border-radius: 10px;
+    font-family: 'Vazirmatn-Regular', Arial, sans-serif;
+}
+
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.modal-content h2 {
+    font-family: 'Vazirmatn-Bold', Arial, sans-serif;
+    color: #3C3C3C;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.submit-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    font-family: 'Vazirmatn-Medium', Arial, sans-serif;
+}
+
+.submit-btn:hover {
+    background-color: #0056b3;
+}
+
+.success-message {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 10px;
+    border: 1px solid #c3e6cb;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.pagination {
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.pagination a {
+    margin: 0 5px;
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    text-decoration: none;
+    color: #007bff;
+}
+
+.pagination a:hover {
+    background-color: #f2f2f2;
+}
+
+.current-page {
+    margin: 0 5px;
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+}
+
+.search-container {
+    position: relative;
+    width: 100%;
+    padding: 0 10px;
+}
+
+/* Update the filter container and grid styles */
+.filter-container {
+    width: 100%; /* Change from 80% to 100% */
+    margin: 0; /* Remove margin */
+    padding: 0;
+}
+
+.filter-toggle {
+    display: inline-flex; /* Change from flex to inline-flex */
+    align-items: center;
+    gap: 8px;
+    color: #3C3C3C;
+    cursor: pointer;
+    padding: 10px 15px;
+    font-size: 16px;
+    background-color: #f5f5f5;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    width: auto; /* Change from 100% to auto */
+    margin-right: 20px; /* Add right margin */
+    font-family: 'Vazirmatn-Medium', Arial, sans-serif;
+}
+.filter-toggle span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.filter-toggle span::before {
+    content: '‹';
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+
+.filter-toggle.active span::before {
+    transform: rotate(-90deg);
+}
+
+.filter-panel {
+    width: 100%;
+    background-color: white;
+    border-radius: 10px;
+    box-sizing: border-box;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-top: 0;
+    position: relative;
+    padding: 0;
+    visibility: hidden;
+    opacity: 0;
+    height: auto;
+}
+
+.filter-panel.active {
+    min-height: 410px;
+    margin-bottom: 24px;
+    margin-top: 12px;
+    padding: 24px;
+    padding-bottom: 72px;
+    visibility: visible;
+    opacity: 1;
+    overflow: hidden;
+    position: relative; /* Add this */
+}
+.filter-panel form {
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
+    display: none; /* Add this */
+}
+
+.filter-panel.active form {
+    opacity: 1;
+    display: block; /* Add this */
+}
+
+.filter-row {
+    width: 100%;
+    max-width: none; /* Add maximum width */
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.filter-input {
+    width: 100%;
+    padding: 8px 30px 8px 8px; /* Change padding to accommodate icon on right */
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    background: url('/static/CorpIssue/images/InvoiceTaskForm Icons/icons V/search.png') no-repeat;
+    background-position: right 8px center; /* Move icon to right side */
+    background-size: 16px;
+    box-sizing: border-box; /* Include padding in width calculation */
+    background-color: #F9FAFB;
+    font-family: 'Vazirmatn-Regular', Arial, sans-serif;
+}
+
+.filter-input::placeholder {
+    color: #BEBEBE;
+    font-family: 'Vazirmatn-Light', Arial, sans-serif;
+}
+
+/* Remove the RTL-specific padding override since we want consistent right-side icon */
+.filter-input[dir="rtl"] {
+    padding: 8px 30px 8px 8px;
+    background-position: right 8px center;
+}
+
+.filter-grid {
+    display: grid;
+    grid-template-columns: 30% 17% 17% 36%; /* Adjusted column widths */
+    gap: 15px; /* Reduced gap between columns */
+    margin-bottom: 10px;
+    width: 100%;
+    padding: 0;
+    box-sizing: border-box;
+    align-items: start; /* Align grid items to the start of their cells */
+}
+
+
+.filter-column {
+    display: flex;
+    flex-direction: column;
+    min-height: 380px; /* Adjust to ensure all columns are same height */
+    gap: 10px;
+}
+.dual-scroll-row {
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+    align-items: flex-end;
+    width: 100%;
+}
+.work-hours-filter.small .work-hours-input {
+    width: 48px;
+    min-width: 0;
+    font-size: 11px;
+    padding: 3px 4px;
+}
+
+.work-hours-filter.small .filter-select-container,
+.work-hours-filter.small .work-hours-inputs-wrapper {
+    min-width: 0;
+    width: 100%;
+}
+.work-hours-filter.small {
+    max-width: 48%;
+    min-width: 0;
+}
+
+.work-hours-filter.small label {
+    font-size: 0.8em;
+    margin-bottom: 2px;
+    text-align: right;
+    line-height: 1.1;
+}
+.work-hours-filter.small .filter-select-container {
+    min-width: 0;
+}
+
+
+.team-filter .multi-select-container,
+.project-filter .multi-select-container {
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    max-height: 180px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.filter-column:nth-child(2) .multi-select-container,
+.filter-column:nth-child(3) .multi-select-container {
+    max-height: 180px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.multi-select-container {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+
+/* Make the fourth column (team/project) larger */
+.filter-column:nth-child(4) {
+    flex: 0 0 40%;
+    max-width: 100%;
+}
+
+/* Make other columns smaller */
+.filter-column:not(:nth-child(4)) {
+    flex: 0 0 20%; /* Don't allow shrinking, grow to 20% */
+}
+
+/* Add styles for team and project filters */
+.team-filter,
+.project-filter {
+    width: calc(100% + 110px); /* 30px right + 10px left */
+    margin-left: -65px;
+    margin-right: -65px;
+    box-sizing: border-box;
+    overflow: visible;
+}
+
+/* Fix height for team and project containers */
+.multi-select-container {
+    height: 110px; /* Height for 2 rows */
+    overflow-y: auto;
+    overflow-x: hidden;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: white;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* Fixed 5 columns */
+    gap: 8px; /* Slightly increased gap */
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Adjust scrollbar styling for the containers */
+
+
+.multi-select-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+#work-hours-ratio-filter,
+#implementation-ratio-filter {
+    width: 88% !important;
+    max-width: 88% !important;
+}
+#invoice-work-hours-filter .filter-select,
+#real-work-hours-filter .filter-select {
+    font-size: 1em;
+    height: 130%;
+    min-width: 130px;
+    width: 130%;
+    max-width: 200px;
+}
+#invoice-work-hours-filter .work-hours-inputs-wrapper .filter-select,
+#real-work-hours-filter .work-hours-inputs-wrapper .filter-select {
+    font-size: 1.3em;
+    height: 150%;
+    min-width: 150px;
+    width: 150%;
+    max-width: 180px;
+}
+.filter-column .filter-row.button-row .red-pill,
+.filter-column .filter-row.button-row .search-button.wide {
+    width: 80%;
+    min-width: 0;
+    max-width: 100%;
+    margin: 0;
+    padding: 8px 0;
+    font-size: 0.95em;
+    border-radius: 20px;
+    display: block;
+    text-align: center;
+    position: static; /* Remove absolute */
+    left: unset;
+    transform: none;
+}
+
+/* Align buttons with column content */
+.filter-column .filter-row.button-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+/* Update multi-select items */
+.multi-select-item {
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+}
+@media (min-width: 900px) {
+    .custom-filter-grid {
+        align-items: stretch;
+    }
+    .filter-column {
+        height: 100%;
+    }
+    .filter-column > .red-pill,
+    .filter-column > .search-button.wide {
+        min-height: 36px;
+        max-height: 40px;
+        font-size: 0.95em;
+        padding: 8px 0;
+    }
+}
+.team-icon.grey {
+    opacity: 0.6;
+}
+
+.team-icon, .project-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+    flex-shrink: 0; /* Prevent icon from shrinking */
+}
+
+/* Update the team and project name styles */
+.team-name, .project-name {
+    font-size: 10px;
+    max-width: 60px;
+    min-height: 18px;
+    text-align: center;
+    margin-top: 2px;
+    line-height: 1.2;
+}
+
+.multi-select-item:hover {
+    background-color: #f5f5f5;
+}
+
+.multi-select-item input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    margin: 0;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.multi-select-item:hover .team-icon.grey {
+    opacity: 0.8;
+}
+
+.multi-select-item.selected .team-icon,
+.multi-select-item.selected .project-icon,
+.multi-select-item:hover .team-icon,
+.multi-select-item:hover .project-icon {
+    transform: scale(1.1); /* Reduced scale effect */
+}
+
+.project-label {
+    font-size: 14px;
+    color: #666;
+    margin-right: 10px;
+}
+
+/* Make each item in the grid a consistent height */
+.project-filter .multi-select-item {
+    min-height: 42px;
+    margin-bottom: 5px;
+    max-height: 42px; /* Ensure fixed height */
+}
+
+.multi-select-item label {
+    margin: 0;
+    cursor: pointer;
+    flex-grow: 1;
+}
+
+.work-hours-filter {
+    width: 100%;
+    background-color: white;
+    border-radius: 5px;
+    padding: 8px;
+    margin-bottom: 10px;
+}
+
+.work-hours-inputs {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 5px;
+    width: 100%; /* Make dropdowns and inputs full width */
+}
+
+.work-hours-input {
+    width: 60px; /* Fixed width */
+    padding: 6px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 12px; /* Smaller font size */
+}
+
+/* When showing both inputs for 'between' option */
+.work-hours-inputs.show-both .work-hours-input {
+    width: calc(50% - 20px); /* Account for the separator and gaps */
+}
+
+.between-separator {
+    color: #666;
+    margin: 0 5px;
+    font-size: 12px; /* Smaller font size */
+}
+
+.clear-filter {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.clear-filter:hover {
+    opacity: 1;
+}
+
+.clear-filter-icon {
+    width: 20px;
+    height: 20px;
+    transition: all 0.3s ease;
+}
+
+.clear-filters-btn {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-family: 'Vazirmatn-Light', Arial, sans-serif;
+    font-size: 0.7em;
+    color: #007bff;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px 10px;
+    display: none; /* Hidden by default */
+}
+
+.clear-filters-btn.visible {
+    display: block;
+}
+
+.clear-filters-btn:hover {
+    text-decoration: underline;
+}
+
+.filter-select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.filter-select-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 5px;
+    position: relative;
+    width: 100%;
+    min-width: 0; /* Prevent overflow */
+}
+
+.work-hours-inputs-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    min-height: 36px;
+}
+
+.comparison-label {
+    color: #666;
+    font-size: 11px;
+    margin-right: 4px;
+    white-space: nowrap;
+    margin-left: 10px;
+    font-size: 12px; /* Smaller font size */
+}
+
+.filter-column:first-child .filter-row {
+    max-width: none;
+    width: 100%;
+}
+
+.inputs-container {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+}
+
+.work-hours-input {
+    width: 55px; /* Slightly smaller input width */
+    padding: 4px 6px;
+    font-size: 11px;
+}
+
+.between-separator {
+    margin: 0 2px;
+    font-size: 11px;
+}
+
+.status-options {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.status-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.status-checkbox input[type="checkbox"] {
+    margin-left: 5px;
+}
+
+.search-button {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    z-index: 1; /* Reduced from 2 */
+    font-family: 'Vazirmatn-Medium', Arial, sans-serif;
+}
+.search-button:hover {
+    background-color: #0056b3;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000; /* Increased to be above everything */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+    padding-top: 60px;
+}
+
+.modal-content {
+    position: relative;
+    z-index: 1001; /* Higher than modal background */
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 50%;
+    border-radius: 10px;
+}
+
+.test {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+table tr:nth-child(odd){
+    background-color: #ebf7fd;
+}
+
+.real-work-hours {
+    position: relative;
+    cursor: pointer;
+}
+
+.work-hours-value {
+    text-align: center;
+}
+
+/* Update the sub-tasks-container styles */
+.sub-tasks-container {
+    font-size: 0.8em;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    opacity: 0;
+    margin-top: 0;
+}
+
+.sub-tasks-container.expanded {
+    max-height: 500px;
+    opacity: 1;
+    margin-top: 5px;
+}
+
+/* Style for sub-task items */
+.sub-task {
+    padding: 4px 0;
+    margin: 2px 0;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(-10px);
+    animation: slideIn 0.3s forwards;
+}
+
+.approve-all-container {
+    position: absolute;
+    top: -40px; /* Adjust this value as needed */
+    left: 20px; /* Adjust this value as needed */
+}
+
+.success-message, .error-message {
+    margin-bottom: 10px; /* Reduced from 20px to 10px */
+}
+
+.approve-all-btn {
+    position: relative;
+    top: 0;
+    left: 0;
+    margin: 5px 0; /* Reduced from 10px to 5px */
+    background-color: #007bff;
+    color: white;
+    padding: 8px 16px; /* Slightly reduced padding */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: 'Vazirmatn-Medium', Arial, sans-serif;
+}
+
+.approve-all-btn:hover {
+    background-color: #0056b3;
+}
+
+@keyframes slideIn {
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.ratio-type {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: white;
+    cursor: pointer;
+}
+
+.ratio-type option {
+    padding: 8px;
+}
+
+.filter-select-container {
+    width: 100%;
+    min-width: 0; /* Prevent overflow */
+}
+
+.multi-select-container {
+    max-height: 180px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: white;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 10px; /* Add margin bottom */
+}
+
+.multi-select-item {
+    display: flex;
+    align-items: center;
+    padding: 3px; /* Reduced padding */
+    gap: 2px; /* Reduced gap */
+    cursor: pointer;
+    flex-direction: column;
+}
+
+.multi-select-item:hover {
+    background-color: #f5f5f5;
+}
+
+.multi-select-item input[type="checkbox"] {
+    margin: 0;
+    cursor: pointer;
+}
+
+.multi-select-item label {
+    margin: 0;
+    cursor: pointer;
+    flex-grow: 1;
+}
+
+.project-filter.active {
+    display: block;
+}
+
+.project-checkbox {
+    margin-right: 10px;
+    cursor: pointer; /* Ensure the pointer cursor is shown */
+}
+
+.loading {
+    text-align: center;
+    padding: 10px;
+    color: #666;
+}
+
+.error {
+    text-align: center;
+    padding: 10px;
+    color: #ff0000;
+}
+
+.hours-pill {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    background-color: #f0f0f0;
+    border-radius: 15px;
+    padding: 4px 10px;
+    width: fit-content;
+    margin: 0 auto;
+    gap: 5px;
+}
+
+.clock-icon {
+    width: 16px;
+    height: 16px;
+    margin-left: 5px;
+}
+
+.hours-value {
+    color: #666;
+    font-size: 0.9em;
+}
+
+/* Make sure the third column filters stay within bounds */
+.filter-column:nth-child(3) .filter-row {
+    margin-bottom: 15px;
+}
+.filter-column:nth-child(3) .work-hours-filter {
+    margin-top: 0;
+}
+
+.filter-column:nth-child(3) .filter-row:nth-child(1) label,
+.filter-column:nth-child(3) .filter-row:nth-child(2) label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.75em;  /* Smaller font size just for these labels */
+    line-height: 1;
+    padding: 0 5px;
+    height: 20px;  /* Fixed height */
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+/* Keep other filter labels unchanged */
+.filter-row:not(:nth-child(1)):not(:nth-child(2)) label,
+.filter-column:not(:nth-child(3)) .filter-row label {
+    white-space: normal;
+    font-size: 0.9em;
+    line-height: 1.2;
+}
+
+/* Update work-hours-input size and remove search icon for specific filters */
+#real-work-hours-filter .work-hours-input,
+#invoice-work-hours-filter .work-hours-input,
+#work-hours-ratio-filter .work-hours-input,
+#implementation-ratio-filter .work-hours-input {
+    width: 72px; /* Increased from 60px (20% increase) */
+    background-image: none; /* Remove search icon */
+}
+
+/* Keep original width and search icon for other inputs */
+.work-hours-input:not(#real-work-hours-filter .work-hours-input):not(#invoice-work-hours-filter .work-hours-input):not(#work-hours-ratio-filter .work-hours-input):not(#implementation-ratio-filter .work-hours-input) {
+    width: 60px;
+    background-image: url('/static/CorpIssue/images/InvoiceTaskForm Icons/icons V/search.png');
+    background-position: right 8px center;
+    background-size: 16px;
+    background-repeat: no-repeat;
+}
+
+/* Style for clear filter icon */
+.clear-filter {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+    margin-left: 4px;
+}
+
+.clear-filter:hover {
+    opacity: 1;
+}
+
+.clear-filter-icon {
+    width: 16px;
+    height: 16px;
+    transition: all 0.3s ease;
+}
+
+/* Update the status icons grid layout */
+.status-icons-grid {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+.filter-column > .red-pill,
+.filter-column > .search-button.wide {
+    width: 80% !important;
+    margin: 6px auto 0 auto !important;
+    min-width: 0;
+    max-width: 100%;
+    padding: 7px 0 !important;
+    font-size: 0.95em;
+}
+.filter-column > .search-button.wide {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+.filter-column:nth-child(1) .filter-row,
+.filter-column:nth-child(2) .filter-row {
+    margin-bottom: 7px;
+    gap: 3px;
+}
+
+.red-pill {
+    background-color: #dc3545 !important;
+    color: #fff !important;
+    border-radius: 20px !important;
+    font-family: 'Vazirmatn-Medium', Arial, sans-serif !important;
+    width: 100%;
+    margin: 10px 0 0 0;
+    padding: 10px 0;
+    font-size: 1em;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.red-pill:hover {
+    background-color: #c82333 !important;
+}
+.search-button.wide {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px 0;
+    font-family: 'Vazirmatn-Medium', Arial, sans-serif;
+    border-radius: 20px;
+    font-size: 1em;
+}
+.team-column .multi-select-container.team-square,
+.project-column .multi-select-container.project-square {
+    margin-top: 0;
+    height: 100%;
+    min-height: 320px; /* Adjust to match 4 rows height */
+    max-height: 320px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    align-content: start;
+    gap: 10px;
+    padding: 10px;
+}
+.team-column label,
+.project-column label {
+    margin-top: 8px; /* Match other column's first row label */
+    margin-bottom: 8px;
+    display: block;
+}
+
+.team-column label, .project-column label {
+    font-size: 1em;
+    font-family: 'Vazirmatn-Bold', Arial, sans-serif;
+    margin-bottom: 8px;
+    text-align: right;
+}
+.team-icon.big, .project-icon.big {
+    width: 38px;
+    height: 38px;
+    margin-bottom: 2px;
+}
+
+.status-filter-item {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.status-icon-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+}
+
+/* Remove any container borders and backgrounds */
+.filter-row:has(.status-icons-grid) {
+    width: 100%;
+    max-width: none;
+    margin-bottom: 10px;
+    background-color: transparent;
+    border: none;
+}
+
+/* Update the filter row that contains status icons */
+/* Update the filter row that contains status icons */
+.filter-row:has(.status-icons-grid) {
+    width: 100%;
+    max-width: none;
+    margin-bottom: 10px; /* Reduced from 20px */
+    margin-top: -10px; /* Add negative margin to bring icons up */
+}
+
+.status-icon-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    gap: 3px;
+}
+
+.status-checkbox {
+    display: none;
+}
+
+/* Make icons slightly smaller */
+.status-filter-icon {
+    width: 24px;
+    height: 24px;
+    transition: all 0.3s ease;
+}
+
+.status-name {
+    font-size: 0.65em; /* Smaller font size */
+    color: #666;
+    text-align: center;
+    max-width: 70px; /* Limit text width */
+    line-height: 1.2;
+}
+
+
+/* Hover and Selected states */
+.status-checkbox:checked + .status-filter-icon {
+    transform: scale(1.1);
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+#send-to-sales-manager-modal .modal-content {
+    width: 400px; /* Make modal smaller */
+    border-radius: 8px; /* Square-ish corners */
+    padding: 20px;
+    text-align: center;
+}
+
+#send-to-sales-manager-modal h2 {
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+#send-to-sales-manager-modal p {
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.confirm-btn {
+    background-color: #28a745;
+    color: white;
+    padding: 8px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-family: 'Vazirmatn-Medium', Arial, sans-serif;
+}
+
+.confirm-btn:hover {
+    background-color: #218838;
+}
+
+.cancel-btn {
+    background-color: #dc3545;
+    color: white;
+    padding: 8px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-family: 'Vazirmatn-Medium', Arial, sans-serif;
+}
+
+.confirm-btn, .cancel-btn {
+    min-width: 80px;
+    padding: 8px 15px;
+}
+
+.cancel-btn:hover {
+    background-color: #c82333;
+}
+.custom-filter-grid {
+    grid-template-columns: 1.2fr 0.8fr 1fr 1fr; /* Second column narrower */
+    gap: 16px; /* Reduce gap between columns */
+}
+
+.help-book-icon {
+    width: 28px;
+    height: 28px;
+    vertical-align: middle;
+}

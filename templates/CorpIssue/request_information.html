@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/bootstrap.rtl.css">
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/fontawesome.css">
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/solid.css">
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/brands.css">
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/jquery-confirm.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/jquery-ui.css">
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/jquery-ui.structure.css">
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/jquery-ui.theme.css">
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/persian-datepicker.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/style.css">
+    <link rel="stylesheet" type="text/css" href="/static/CorpIssue/css/jquery-confirm.css">
+    <link href="/static/CorpIssue/FA/Web/css/all.css" rel="stylesheet">
+    <title>اطلاعات درخواست ها </title>
+</head>
+<body>
+<div class="request-info-table">
+    <table class="table-fill">
+        <thead>
+        <tr>
+            <th class="text-left">عنوان درخواست</th>
+            <th class="text-left">شرکت </th>
+            <th class="text-left">تیم</th>
+            <th class="text-left">نسخه </th>
+            <th class="text-left">وضعیت درخواست</th>
+            <th class="text-left">شماره تسک </th>
+            <th class="text-left"> ساعت کارکرد</th>
+            <th class="text-left">مدت زمان پاسخ به درخواست</th>
+            <th class="text-left">تاریخ ثبت درخواست</th>
+            <th class="text-left">تاریخ خاتمه درخواست</th>
+        </tr>
+        </thead>
+        <tbody class="table-hover">
+        {% for request in requests_info %}
+            <tr>
+                <td class="text-left">{{ request.Title }}</td>
+                <td class="text-left">
+                    <img class="img-request-info" alt="{{ request.CorpName }}" title="{{ request.CorpName }}"
+                         src="/static/CorpIssue/images/corp_logo/{{ request.CorpCode }}.png">{{ request.CorpName }}
+                </td>
+                <td class="text-left">
+                    <img class="img-request-info" alt="{{ request.TeamCode }}" title="{{ request.TeamCode }}"
+                         src="/static/CorpIssue/images/team/{{ request.TeamCode }}.png">
+                </td>
+                <td>{{ request.VersionNumber }}</td>
+                <td>
+                    {% if request.State == State_Sale %} ارسال جهت اظهار نظر مدیر فروش {% endif %}
+                    {% if request.State == State_Team %} ارسال جهت اظهار نظر مدیر تیم {% endif %}
+                    {% if request.State == State_Finish %} خاتمه درخواست {% endif %}
+                </td>
+                <td>{{ request.TaskNumber}}</td>
+                <td>{{ request.WorkHours}}</td>
+                <td>{{ request.Duration}}</td>
+                <td>{{ request.RequestDate}}</td>
+                <td>{% if request.FinishDate %}{{ request.FinishDate}}{% else %} {% endif %}خاتمه نیافته </td>
+            </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+</div>
+
+
+</body>
+<script src="/static/CorpIssue/js/jquery-3.6.0.min.js"></script>
+<script src="/static/CorpIssue/js/fontawesome.min.js"></script>
+<script src="/static/CorpIssue/js/jquery-confirm.js"></script>
+<script src="/static/CorpIssue/js/jquery-ui.js"></script>
+<script src="/static/CorpIssue/js/fontawesome.js"></script>
+<script src="/static/CorpIssue/js/persian-date.min.js"></script>
+<script src="/static/CorpIssue/js/persian-datepicker.min.js"></script>
+<script src="/static/CorpIssue/js/MyCodeNew.js"></script>
+</html>

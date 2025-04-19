@@ -1,0 +1,22 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خطا</title>
+    <link rel="stylesheet" href="{% static 'CorpIssue/css/error.css' %}">
+    <link rel="stylesheet" href="{% static 'CorpIssue/fontawesome/css/all.min.css' %}">
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="error-message">
+            {{ error }}
+        </div>
+        <a href="{% url 'list_corps' %}" class="create-version-btn">بازگشت به صفحه اصلی</a>
+    </div>
+</body>
+</html>
