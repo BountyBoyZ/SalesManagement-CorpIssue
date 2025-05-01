@@ -394,7 +394,7 @@
                      alt="تایید شده توسط مدیر پروژه"
                      class="status-icon">
             </div>
-        {% elif task.status == 'در انتظار معاون محصول' or task.status_class == 'status-pending' %}
+        {% elif task.status == 'First Time Created' or task.status_class == 'status-pending' %}
         <div class="status-icon-tooltip" data-tooltip="در انتظار معاون محصول">
             <img src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/status-pending.png' %}" 
                     alt="در انتظار معاون محصول"
