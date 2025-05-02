@@ -257,6 +257,7 @@ def invoice_tasks(request, invoice_id):
         # Add RejectedByCustomer to filter conditions when invoice is in ReturnedToProjectManager status
         if invoice.status.code == 'InvoiceStatus_ReturnedToProjectManager':
             filter_conditions.append('InvoiceTaskStatus_RejectedByCustomer')
+            filter_conditions.append('InvoiceTaskStatus_RejectedBySalesManager')
 
         invoice_tasks = InvoiceTask.objects.filter(
             invoice=invoice,
@@ -626,6 +627,14 @@ def approve_task(request, task_id):
         invoice_task.status = approved_status
         invoice_task.save()
         
+        team_manager = invoice_task.task.project.team_code.manager
+        if team_manager:
+            send_document(
+                doc_id=invoice_task.invoice.doc_id,
+                sender=request.user.username,
+                inbox_owners=[team_manager]
+            )
+        
         # Check if all tasks are approved
         invoice = invoice_task.invoice
         if not InvoiceTask.objects.filter(invoice=invoice).exclude(status=approved_status).exists():
@@ -646,6 +655,27 @@ def approve_task(request, task_id):
                     'error': 'پاسخ فناوران الزامی است'
                 })
 
+            # Find all rejection details for this task, ordered by created_at
+            rejections = list(RejectionDetails.objects.filter(invoice_task=invoice_task).order_by('created_at'))
+
+            # Find the latest insurance comment (RejectedByCustomer) that does NOT have a later ApprovedByProjectManager after it
+            latest_unanswered = None
+            for i, rej in enumerate(rejections):
+                if rej.const_value.code == 'InvoiceTaskStatus_RejectedByCustomer':
+                    # Check if there is an ApprovedByProjectManager after this
+                    has_response = False
+                    for later in rejections[i+1:]:
+                        if later.const_value.code == 'InvoiceTaskStatus_ApprovedByProjectManager':
+                            has_response = True
+                            break
+                    if not has_response:
+                        latest_unanswered = rej
+
+            # Now, when the sales manager submits a response, attach it to this latest_unanswered
+            if latest_unanswered:
+                latest_unanswered.explanation = response_text
+                latest_unanswered.save()
+
             # Create rejection details with response
             approved_status = ConstValue.objects.get(code='InvoiceTaskStatus_ApprovedByProjectManager')
             RejectionDetails.objects.create(
@@ -660,31 +690,39 @@ def approve_task(request, task_id):
             invoice_task.status = approved_status
             invoice_task.save()
 
-            # Check if all rejected tasks are now approved
-            remaining_rejected = InvoiceTask.objects.filter(
-                invoice=invoice_task.invoice,
-                status__code='InvoiceTaskStatus_RejectedByCustomer'
-            ).exists()
+            # Only auto-transition if invoice is NOT in ReturnedToProjectManager
+            if invoice_task.invoice.status.code != 'InvoiceStatus_ReturnedToProjectManager':
+                remaining_rejected = InvoiceTask.objects.filter(
+                    invoice=invoice_task.invoice,
+                    status__code='InvoiceTaskStatus_RejectedByCustomer'
+                ).exists()
 
-            if not remaining_rejected:
-                # Change invoice status to SentToSalesManager
-                sent_to_sales_status = ConstValue.objects.get(code='InvoiceStatus_SentToSalesManager')
-                invoice_task.invoice.status = sent_to_sales_status
-                invoice_task.invoice.save()
+                if not remaining_rejected:
+                    # Change invoice status to SentToSalesManager
+                    sent_to_sales_status = ConstValue.objects.get(code='InvoiceStatus_SentToSalesManager')
+                    invoice_task.invoice.status = sent_to_sales_status
+                    invoice_task.invoice.save()
 
-                # Send document to sales manager
-                sales_manager = ConstValue.objects.get(code='StaticRoles_SalesManager')
-                if sales_manager and sales_manager.value:
-                    send_document(
-                        doc_id=invoice_task.invoice.doc_id,
-                        sender=user_nationalcode,
-                        inbox_owners=[sales_manager.value]
-                    )
+                    # Send document to sales manager
+                    sales_manager = ConstValue.objects.get(code='StaticRoles_SalesManager')
+                    if sales_manager and sales_manager.value:
+                        send_document(
+                            doc_id=invoice_task.invoice.doc_id,
+                            sender=user_nationalcode,
+                            inbox_owners=[sales_manager.value]
+                        )
         else:
-            # Keep existing team manager logic for other statuses
             approved_status = ConstValue.objects.get(code='InvoiceTaskStatus_ApprovedByProjectManager')
             invoice_task.status = approved_status
             invoice_task.save()
+
+            sales_manager = ConstValue.objects.get(code='StaticRoles_SalesManager')
+            if sales_manager and sales_manager.value:
+                send_document(
+                    doc_id=invoice_task.invoice.doc_id,
+                    sender=user_nationalcode,
+                    inbox_owners=[sales_manager.value]
+                )
 
     return JsonResponse({'success': True})
 
@@ -762,22 +800,22 @@ def rejection_details(request, task_id):
     try:
         token = find_token(request)
         user_nationalcode = get_token_data(token, "user_NationalCode")
-        
-        # Check if user is a team manager
+
+        # Allow both team managers and sales manager
         user_team = Team.objects.filter(manager=user_nationalcode).first()
-        if not user_team:
+        is_sales_manager = ConstValue.objects.filter(
+            parent_code__code='StaticRoles',
+            code='StaticRoles_SalesManager',
+            value=user_nationalcode
+        ).exists()
+
+        if not user_team and not is_sales_manager:
             return JsonResponse({'success': False, 'error': 'شما دسترسی لازم برای مشاهده این صفحه را ندارید.'})
 
-        if user_team.team_code == 'POD':
-            # For product assistant, get first rejection detail
-            rejection_detail = RejectionDetails.objects.filter(
-                invoice_task__task_id=task_id
-            ).first()
-        else:
-            # For team managers, get the latest rejection detail
-            rejection_detail = RejectionDetails.objects.filter(
-                invoice_task__task_id=task_id
-            ).order_by('-created_at').first()
+        # Always show the latest rejection detail
+        rejection_detail = RejectionDetails.objects.filter(
+            invoice_task__task_id=task_id
+        ).order_by('-created_at').first()
 
         if rejection_detail:
             data = {
@@ -793,7 +831,6 @@ def rejection_details(request, task_id):
         data = {'success': False, 'error': str(e)}
 
     return JsonResponse(data)
-
 
 @csrf_exempt
 @permission_control
@@ -950,30 +987,34 @@ def sales_manager_view(request, invoice_id):
                 team = project.team_code
 
                 # Get rejection details if any
-                rejection_details = RejectionDetails.objects.filter(
+                rejection_details = list(RejectionDetails.objects.filter(
                     invoice_task=invoice_task
-                ).order_by('created_at')
+                ).order_by('created_at'))
 
                 insurance_comments = []
                 dev_responses = []
 
-                for rejection in rejection_details:
+                # Track the index of each insurance comment
+                insurance_indices = []
+                for i, rejection in enumerate(rejection_details):
                     if rejection.const_value.code == 'InvoiceTaskStatus_RejectedByCustomer':
                         insurance_comments.append(rejection.explanation)
-                    elif rejection.const_value.code == 'InvoiceTaskStatus_ApprovedByProjectManager':
-                        dev_responses.append(rejection.explanation)
+                        insurance_indices.append(i)
 
-                # Get the latest customer rejection that doesn't have a developer response
-                latest_rejection = None
-                if len(insurance_comments) > len(dev_responses):
-                    latest_rejection = rejection_details.filter(
-                        const_value__code='InvoiceTaskStatus_RejectedByCustomer'
-                    )[len(dev_responses)]
+                # For each insurance comment, find the latest dev response after it and before the next insurance comment
+                for n, start_idx in enumerate(insurance_indices):
+                    end_idx = insurance_indices[n + 1] if n + 1 < len(insurance_indices) else len(rejection_details)
+                    latest_response = ''
+                    for j in range(start_idx + 1, end_idx):
+                        r = rejection_details[j]
+                        if r.const_value.code == 'InvoiceTaskStatus_ApprovedByProjectManager':
+                            latest_response = r.explanation
+                    dev_responses.append(latest_response)
 
-                # Extend lists to be of equal length
+                # Pad lists to the same length
                 max_length = max(len(insurance_comments), len(dev_responses))
-                insurance_comments.extend([''] * (max_length - len(insurance_comments)))
-                dev_responses.extend([''] * (max_length - len(dev_responses)))
+                insurance_comments += [''] * (max_length - len(insurance_comments))
+                dev_responses += [''] * (max_length - len(dev_responses))
 
                 # Save for second pass
                 task_comments[task.task_id] = {
@@ -984,7 +1025,6 @@ def sales_manager_view(request, invoice_id):
                     'invoice_task': invoice_task,
                     'insurance_comments': insurance_comments,
                     'dev_responses': dev_responses,
-                    'latest_rejection': latest_rejection,
                     'max_length': max_length
                 }
                 if max_length > max_n:
@@ -999,7 +1039,6 @@ def sales_manager_view(request, invoice_id):
                 invoice_task = data['invoice_task']
                 insurance_comments = data['insurance_comments']
                 dev_responses = data['dev_responses']
-                latest_rejection = data['latest_rejection']
                 max_length = data['max_length']
 
                 # Pad to max_n for all tasks
@@ -1016,7 +1055,6 @@ def sales_manager_view(request, invoice_id):
                     'کارکرد واقعی': task.real_work_hours_display,
                     'کارکرد اعلامی': invoice_task.invoice_work_hours_display,
                     'وضعیت': invoice_task.status.value,
-                    'دلیل عدم تایید': latest_rejection.const_value.value if latest_rejection else '',
                     'نظر شرکت بیمه': insurance_comments[0] if insurance_comments else '',
                     'پاسخ فناوران': dev_responses[0] if dev_responses else ''
                 }
@@ -1111,6 +1149,54 @@ def sales_manager_view(request, invoice_id):
             except Exception as e:
                 logger.error(f"Error processing file: {str(e)}")
                 return JsonResponse({'success': False, 'error': str(e)})
+
+    if invoice.status.code == 'InvoiceStatus_ReturnedToProjectManager':
+        # Only show relevant tasks
+        allowed_statuses = [
+            'InvoiceTaskStatus_RejectedByCustomer',
+            'InvoiceTaskStatus_ApprovedByProjectManager',
+            'InvoiceTaskStatus_RejectedBySalesManager',
+            'InvoiceTaskStatus_ApprovedBySalesManager'
+        ]
+        invoice_tasks = InvoiceTask.objects.filter(
+            invoice=invoice,
+            status__code__in=allowed_statuses
+        ).select_related('task', 'status')
+
+        # Get rejection reasons for sales manager
+        rejection_parent = ConstValue.objects.get(code='InvoiceTaskStatus_RejectedByCustomer')
+        rejection_reasons = ConstValue.objects.filter(parent_code=rejection_parent)
+
+        # Prepare data for template
+        tasks_data = []
+        for t in invoice_tasks:
+            latest_rejection = RejectionDetails.objects.filter(
+                invoice_task=t
+            ).order_by('-created_at').first()
+            tasks_data.append({
+                'task_id': t.task.task_id,
+                'task_title': t.task.task_title,
+                'task_type': t.task.task_kind.value,
+                'project': t.task.project.project_name,
+                'team': t.task.project.team_code.team_code,
+                'real_work_hours': t.task.real_work_hours_display,
+                'invoice_work_hours': t.invoice_work_hours_display,
+                'status': t.status.value,
+                'status_code': t.status.code,
+                'rejection_title': latest_rejection.const_value.value if latest_rejection else '',
+                'rejection_explanation': latest_rejection.explanation if latest_rejection else '',
+            })
+
+        return render(request, "CorpIssue/sales_manager_form.html", {
+            'corp_name': corp.corp_name,
+            'corp_code': corp.corp_code,
+            'version_number': version_number,
+            'invoice': invoice,
+            'show_returned_to_pm_table': True,
+            'tasks_data': tasks_data,
+            'rejection_reasons': rejection_reasons,
+            'help_doc': 'CorpIssue/Help Docs/Help 3.pdf'
+        })
 
     invoices = Invoice.objects.filter(id=invoice_id)
     return render(request, "CorpIssue/sales_manager_form.html", {
@@ -1219,32 +1305,7 @@ def next_stage(request, invoice_id):
                     logger.error(f"Error processing next stage: {str(e)}")
                     return JsonResponse({'success': False, 'error': str(e)})
 
-            elif invoice.status.code == 'InvoiceStatus_ReturnedToProjectManager':
-                # Check if all rejected tasks are approved
-                rejected_tasks = invoice.invoicetask_set.filter(
-                    status__code='InvoiceTaskStatus_RejectedByCustomer'
-                )
-                
-                if rejected_tasks.exists():
-                    return JsonResponse({
-                        'success': False, 
-                        'error': 'تمامی تسک های رد شده باید توسط مدیر پروژه تایید شوند'
-                    })
 
-                # Update status to SentToSalesManager
-                new_status = ConstValue.objects.get(code='InvoiceStatus_SentToSalesManager')
-                invoice.status = new_status
-                invoice.save()
-                
-                # Send document to sales manager
-                sales_manager = ConstValue.objects.get(code='StaticRoles_SalesManager')
-                if sales_manager and sales_manager.value:
-                    send_document(
-                        doc_id=invoice.doc_id,
-                        sender=user_nationalcode,
-                        inbox_owners=[sales_manager.value]
-                    )
-                return JsonResponse({'success': True})
                 
             return JsonResponse({'success': False, 'error': 'Invalid invoice status'})
             
@@ -1252,4 +1313,98 @@ def next_stage(request, invoice_id):
             logger.error(f"Error in next_stage: {str(e)}")
             return JsonResponse({'success': False, 'error': str(e)})
             
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+
+@csrf_exempt
+@permission_control
+def approve_task_sales_manager(request, task_id):
+    # Set status to ApprovedBySalesManager
+    try:
+        invoice_task = InvoiceTask.objects.get(task_id=task_id)
+        approved_status = ConstValue.objects.get(code='InvoiceTaskStatus_ApprovedBySalesManager')
+        invoice_task.status = approved_status
+        invoice_task.save()
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+@csrf_exempt
+@permission_control
+def reject_task_sales_manager(request, task_id):
+    # Set status to RejectedBySalesManager, create RejectionDetails
+    try:
+        data = json.loads(request.body)
+        reason_id = data.get('reason_id')
+        explanation = data.get('explanation')
+        invoice_task = InvoiceTask.objects.get(task_id=task_id)
+        rejected_status = ConstValue.objects.get(code='InvoiceTaskStatus_RejectedBySalesManager')
+        rejection_reason = ConstValue.objects.get(id=reason_id)
+        # Create rejection details
+        RejectionDetails.objects.create(
+            const_value=rejection_reason,
+            invoice_task=invoice_task,
+            explanation=explanation,
+            rejected_by=request.user.username,
+            created_by=request.user.username
+        )
+        invoice_task.status = rejected_status
+        invoice_task.save()
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
+@csrf_exempt
+@permission_control
+def next_stage_sales_manager(request, invoice_id):
+    # Approve all visible tasks, set invoice status to SentToSalesManager
+    try:
+        invoice = Invoice.objects.get(id=invoice_id)
+        approved_status = ConstValue.objects.get(code='InvoiceTaskStatus_ApprovedBySalesManager')
+        InvoiceTask.objects.filter(
+            invoice=invoice,
+            status__code__in=[
+                'InvoiceTaskStatus_RejectedByCustomer',
+                'InvoiceTaskStatus_ApprovedByProjectManager',
+                'InvoiceTaskStatus_RejectedBySalesManager',
+                'InvoiceTaskStatus_ApprovedBySalesManager'
+            ]
+        ).update(status=approved_status)
+        sent_status = ConstValue.objects.get(code='InvoiceStatus_SentToSalesManager')
+        invoice.status = sent_status
+        invoice.save()
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+    
+@csrf_exempt
+@permission_control
+def approve_all_and_send(request, invoice_id):
+    """Approve all tasks and send to customer."""
+    if request.method == 'POST':
+        try:
+            invoice = Invoice.objects.get(id=invoice_id)
+            
+            # Get the necessary statuses
+            approved_status = ConstValue.objects.get(code='InvoiceTaskStatus_ApprovedBySalesManager')
+            sent_to_sales_manager_status = ConstValue.objects.get(code='InvoiceStatus_SentToSalesManager')
+            
+            # Update all eligible tasks
+            InvoiceTask.objects.filter(
+                invoice=invoice,
+                status__code__in=[
+                    'InvoiceTaskStatus_ApprovedByProjectManager',
+                    'InvoiceTaskStatus_RejectedBySalesManager',
+                    'InvoiceTaskStatus_RejectedByCustomer'
+                ]
+            ).update(status=approved_status)
+            
+            # Update invoice status
+            invoice.status = sent_to_sales_manager_status
+            invoice.save()
+            
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    
     return JsonResponse({'success': False, 'error': 'Invalid request method'})

@@ -26,7 +26,7 @@ function approveTask(taskId) {
     const taskRow = document.querySelector(`tr[data-task-id="${taskId}"]`);
     const status = taskRow.querySelector('td:nth-child(8)').textContent.trim();
 
-    if (status === 'رد شده توسط مشتری') {
+    if (status === 'رد شده توسط مشتری' || status === 'رد شده توسط مدیر فروش') {
         showResponseModal(taskId);
         return;
     }
@@ -1070,6 +1070,91 @@ function initializeTeamProjectFilters() {
     }
 }
 
+function approveTaskSalesManager(taskId) {
+    $.ajax({
+        url: `/SalesManagement/CorpIssue/approve_task_sales_manager/${taskId}/`,
+        type: 'POST',
+        headers: { 'X-CSRFToken': csrfToken },
+        success: function(data) {
+            if (data.success) location.reload();
+            else alert('خطا: ' + data.error);
+        }
+    });
+}
+
+function showRejectionModalSalesManager(taskId) {
+    // Show modal for sales manager to select reason and enter explanation
+    $('#rejection-task-id').val(taskId);
+    $('#rejection-modal-sales-manager').show();
+}
+
+function submitRejectionFormSalesManager(event) {
+    event.preventDefault();
+    const taskId = $('#rejection-task-id').val();
+    const reasonId = $('#rejection-reason-sales-manager').val();
+    const explanation = $('#rejection-explanation-sales-manager').val();
+    $.ajax({
+        url: `/SalesManagement/CorpIssue/reject_task_sales_manager/${taskId}/`,
+        type: 'POST',
+        headers: { 'X-CSRFToken': csrfToken },
+        data: JSON.stringify({ reason_id: reasonId, explanation: explanation }),
+        contentType: 'application/json',
+        success: function(data) {
+            if (data.success) location.reload();
+            else alert('خطا: ' + data.error);
+        }
+    });
+}
+
+function showNextStageModalSalesManager() {
+    $('#next-stage-modal-sales-manager').show();
+}
+
+function confirmNextStageSalesManager(invoiceId) {
+    $.ajax({
+        url: `/SalesManagement/CorpIssue/next_stage_sales_manager/${invoiceId}/`,
+        type: 'POST',
+        headers: { 'X-CSRFToken': csrfToken },
+        success: function(data) {
+            if (data.success) location.reload();
+            else alert('خطا: ' + data.error);
+        }
+    });
+}
+
+function showNextStageModalPM() {
+    $('#next-stage-modal-pm').show();
+}
+
+function confirmNextStagePM(invoiceId) {
+    $.ajax({
+        url: `/SalesManagement/CorpIssue/approve_all_and_send/${invoiceId}/`,
+        type: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken
+        },
+        success: function(response) {
+            if (response.success) {
+                location.reload();
+            } else {
+                alert('خطا: ' + response.error);
+            }
+        },
+        error: function() {
+            alert('خطا در ارتباط با سرور');
+        }
+    });
+}
+
+// Add modal close handler
+$(document).ready(function() {
+    // Close modal when clicking outside
+    $(window).click(function(event) {
+        if ($(event.target).hasClass('modal')) {
+            $(event.target).hide();
+        }
+    });
+});
 // Add this function to handle clear filters
 function handleClearFilters() {
     const clearFiltersBtn = document.getElementById('clearFiltersBtn');

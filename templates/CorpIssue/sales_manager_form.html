@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
+    
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,9 @@
     <link rel="stylesheet" href="{% static 'CorpIssue/fontawesome/css/all.min.css' %}">
     <script src="{% static 'CorpIssue/js/jquery-3.6.0.min.js' %}"></script>
     <script src="{% static 'CorpIssue/js/corp_issue.js' %}" defer></script>
+    <script>
+        var csrfToken = '{{ csrf_token }}';
+    </script>
 </head>
 <div style="position: fixed; left: 10px; bottom: 5px; z-index: 9999; font-size: 11px; color: #007bff; display: flex; align-items: center; cursor: pointer;">
     <img src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/faq.png' %}" style="width: 16px; height: 16px; margin-left: 4px;">
@@ -49,61 +53,62 @@
     </div>
         <div class="container">
             <div class="content-wrapper {% if invoice.status.code == 'InvoiceStatus_ReturnedToProjectManager' %}returned-to-pm-view{% elif invoice.status.code == 'InvoiceStatus_SentToSalesManager' %}sales-manager-view{% else %}customer-view{% endif %}">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>عنوان فایل</th>
-                            <th>تاریخ آخرین وضعیت</th>
-                            <th>وضعیت</th>
-                            <th>دانلود فایل</th>
-                            {% if invoice.status.code == 'InvoiceStatus_SentToCustomer' %}
-                            <th>آپلود فایل</th>
-                            {% endif %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for invoice in invoices %}
-                        <tr>
-                            <td>صورت حساب نسخه {{ version_number }} بیمه {{ corp_name }}</td>
-                            <td>{{ invoice.updated_at|date:'Y/m/d H:i:s' }}</td>
-                            <td>
-                                <span class="status-pill {{ invoice.status.code }}">
-                                    {% if invoice.status.code == 'InvoiceStatus_SentToSalesManager' %}
-                                        ارسال شده برای مدیر فروش
-                                    {% elif invoice.status.code == 'InvoiceStatus_SentToCustomer' %}
-                                        ارسال شده به مشتری
-                                    {% else %}
-                                        {{ invoice.status.value }}
-                                    {% endif %}
-                                </span>
-                            </td>
-                            <td>
-                                <form method="POST" style="display: inline;">
-                                    {% csrf_token %}
-                                    <button type="submit" name="download" class="download-btn"
-                                        {% if invoice.status.code != 'InvoiceStatus_SentToSalesManager' %}disabled{% endif %}>
-                                        <i class="fas fa-download"></i>
-                                        دانلود
-                                    </button>
-                                </form>
-                            </td>
-                            {% if invoice.status.code == 'InvoiceStatus_SentToCustomer' %}
-                            <td>
-                                <form method="POST" enctype="multipart/form-data" class="file-input-container" data-invoice-id="{{ invoice.id }}">
-                                    {% csrf_token %}
-                                    <button type="button" class="upload-btn" onclick="uploadSelectedFile('{{ invoice.id }}')">
-                                        <i class="fas fa-upload"></i>
-                                        آپلود
-                                    </button>
-                                </form>
-                                <div id="upload-success-{{ invoice.id }}" class="upload-success" style="display: none;"></div>
-                            </td>
-                            {% endif %}
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-
+                {% if invoice.status.code != 'InvoiceStatus_ReturnedToProjectManager' %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>عنوان فایل</th>
+                                <th>تاریخ آخرین وضعیت</th>
+                                <th>وضعیت</th>
+                                <th>دانلود فایل</th>
+                                {% if invoice.status.code == 'InvoiceStatus_SentToCustomer' %}
+                                <th>آپلود فایل</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for invoice in invoices %}
+                            <tr>
+                                <td>صورت حساب نسخه {{ version_number }} بیمه {{ corp_name }}</td>
+                                <td>{{ invoice.updated_at|date:'Y/m/d H:i:s' }}</td>
+                                <td>
+                                    <span class="status-pill {{ invoice.status.code }}">
+                                        {% if invoice.status.code == 'InvoiceStatus_SentToSalesManager' %}
+                                            ارسال شده برای مدیر فروش
+                                        {% elif invoice.status.code == 'InvoiceStatus_SentToCustomer' %}
+                                            ارسال شده به مشتری
+                                        {% else %}
+                                            {{ invoice.status.value }}
+                                        {% endif %}
+                                    </span>
+                                </td>
+                                <td>
+                                    <form method="POST" style="display: inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" name="download" class="download-btn"
+                                            {% if invoice.status.code != 'InvoiceStatus_SentToSalesManager' %}disabled{% endif %}>
+                                            <i class="fas fa-download"></i>
+                                            دانلود
+                                        </button>
+                                    </form>
+                                </td>
+                                {% if invoice.status.code == 'InvoiceStatus_SentToCustomer' %}
+                                <td>
+                                    <form method="POST" enctype="multipart/form-data" class="file-input-container" data-invoice-id="{{ invoice.id }}">
+                                        {% csrf_token %}
+                                        <button type="button" class="upload-btn" onclick="uploadSelectedFile('{{ invoice.id }}')">
+                                            <i class="fas fa-upload"></i>
+                                            آپلود
+                                        </button>
+                                    </form>
+                                    <div id="upload-success-{{ invoice.id }}" class="upload-success" style="display: none;"></div>
+                                </td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
                 {% if invoice.status.code == 'InvoiceStatus_SentToCustomer' %}
                 <div class="upload-zone-container">
                     <div class="upload-zone">
@@ -137,6 +142,139 @@
                     </button>
                 </div>
                 {% endif %}
+
+                {% if invoice.status.code == 'InvoiceStatus_ReturnedToProjectManager' %}
+                <div class="next-stage-container">
+                    <button class="next-stage-btn" onclick="showNextStageModalPM()">
+                        <i class="fas fa-arrow-right"></i>
+                        مرحله بعد
+                    </button>
+                </div>
+
+                <div id="next-stage-modal-pm" class="modal">
+                    <div class="modal-content">
+                        <span class="close" onclick="$('#next-stage-modal-pm').hide()">&times;</span>
+                        <h3>آیا از تایید تمامی تسک ها مطمعن هستید و میخواهید آن را برای مشتری ارسال کنید؟</h3>
+                        <div class="modal-buttons">
+                            <button class="confirm-btn" onclick="confirmNextStagePM('{{ invoice.id }}')">تایید</button>
+                            <button class="cancel-btn" onclick="$('#next-stage-modal-pm').hide()">انصراف</button>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if show_returned_to_pm_table %}
+                <div class="table-wrapper table-wrapper-relative">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>شناسه تسک</th>
+                                <th>عنوان تسک</th>
+                                <th>نوع تسک</th>
+                                <th>پروژه</th>
+                                <th>تیم</th>
+                                <th>کارکرد واقعی</th>
+                                <th>کارکرد اعلامی</th>
+                                <th>وضعیت تسک</th>
+                                <th>عملیات</th>
+                                <th>دلیل عدم تایید</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for task in tasks_data %}
+                            <tr data-task-id="{{ task.task_id }}">
+                                <td>{{ task.task_id }}</td>
+                                <td>{{ task.task_title }}</td>
+                                <td>{{ task.task_type }}</td>
+                                <td>{{ task.project }}</td>
+                                <td>
+                                    <img src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/' %}{{ task.team }}.png"
+                                         alt="{{ task.team }}"
+                                         class="table-team-icon"
+                                         title="{{ task.team }}">
+                                </td>
+                                <td class="real-work-hours">
+                                    <div class="hours-pill">
+                                        <img src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/clock.png' %}"
+                                             alt="clock"
+                                             class="clock-icon">
+                                        <span class="hours-value">{{ task.real_work_hours }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="hours-pill">
+                                        <img src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/clock.png' %}"
+                                             alt="clock"
+                                             class="clock-icon">
+                                        <span class="hours-value">{{ task.invoice_work_hours }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status-pill {{ task.status_code }}">
+                                        {% if task.status_code == 'InvoiceTaskStatus_ApprovedBySalesManager' %}
+                                            تایید شده توسط مدیر فروش
+                                        {% elif task.status_code == 'InvoiceTaskStatus_RejectedBySalesManager' %}
+                                            رد شده توسط مدیر فروش
+                                        {% elif task.status_code == 'InvoiceTaskStatus_ApprovedByProjectManager' %}
+                                            تایید شده توسط مدیر پروژه
+                                        {% elif task.status_code == 'InvoiceTaskStatus_RejectedByCustomer' %}
+                                            رد شده توسط مشتری
+                                        {% elif task.status_code == 'InvoiceTaskStatus_ApprovedByProductAssistant' %}
+                                            تایید شده توسط معاون محصول
+                                        {% elif task.status_code == 'InvoiceTaskStatus_RejectedByProductAssistant' %}
+                                            رد شده توسط معاون محصول
+                                        {% elif task.status_code == 'InvoiceTaskStatus_PendingByProductAssistant' %}
+                                            در انتظار معاون محصول
+                                        {% else %}
+                                            {{ task.status }}
+                                        {% endif %}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="approve-btn" onclick="approveTaskSalesManager('{{ task.task_id }}')">
+                                        <img src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/tick-grey.png' %}"
+                                             alt="✔"
+                                             class="action-icon approve-icon"
+                                             data-hover="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/tick-hover.png' %}"
+                                             data-selected="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/tick.png' %}">
+                                    </button>
+                                    <button class="reject-btn" onclick="showRejectionModalSalesManager('{{ task.task_id }}')">
+                                        <img src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/cross-grey.png' %}"
+                                             alt="✖"
+                                             class="action-icon reject-icon"
+                                             data-hover="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/cross-hover.png' %}"
+                                             data-selected="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/cross.png' %}">
+                                    </button>
+                                </td>
+                                <td>
+                                    {% if task.status_code == 'InvoiceTaskStatus_ApprovedByProjectManager' %}
+                                        <span class="rejection-reason">تایید شده توسط مدیر پروژه</span>
+                                        <button class="info-btn" onclick="showRejectionDetails('{{ task.task_id }}')">!</button>
+                                    {% elif task.rejection_title %}
+                                        <span class="rejection-reason">{{ task.rejection_title }}</span>
+                                        <button class="info-btn" onclick="showRejectionDetails('{{ task.task_id }}')">!</button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <button class="next-stage-btn next-stage-btn-absolute" onclick="showNextStageModalPM()">
+                        <i class="fas fa-arrow-right"></i>
+                        مرحله بعد
+                    </button>
+                    <div id="next-stage-modal-pm" class="modal">
+                        <div class="modal-content">
+                            <span class="close" onclick="$('#next-stage-modal-pm').hide()">&times;</span>
+                            <h3>آیا از تایید تمامی تسک ها مطمعن هستید و میخواهید آن را برای مشتری ارسال کنید؟</h3>
+                            <div class="modal-buttons">
+                                <button class="confirm-btn" onclick="confirmNextStagePM('{{ invoice.id }}')">تایید</button>
+                                <button class="cancel-btn" onclick="$('#next-stage-modal-pm').hide()">انصراف</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
             </div>
         </div>
     {% endif %}
@@ -157,6 +295,40 @@
             </div>
         </div>
     </div>
+
+    <!-- Sales Manager Rejection Modal -->
+    <div id="rejection-modal-sales-manager" class="modal">
+        <div class="modal-content rectangular-modal">
+            <span class="close" onclick="$('#rejection-modal-sales-manager').hide()">&times;</span>
+            <form id="rejection-form-sales-manager" onsubmit="submitRejectionFormSalesManager(event)">
+                <input type="hidden" id="rejection-task-id" name="task_id">
+                <div class="form-group" style="align-items: flex-end;">
+                    <label class="modal-label" for="rejection-reason-sales-manager">دلیل عدم تایید</label>
+                    <select id="rejection-reason-sales-manager" name="rejection_reason" required>
+                        <option value="" selected>انتخاب کنید...</option>
+                        {% for reason in rejection_reasons %}
+                            <option value="{{ reason.id }}">{{ reason.value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group" style="align-items: flex-end;">
+                    <label class="modal-label" for="rejection-explanation-sales-manager">توضیحات دلیل عدم تایید</label>
+                    <textarea id="rejection-explanation-sales-manager" name="rejection_explanation" required style="min-height: 120px; width: 100%;"></textarea>
+                </div>
+                <button type="submit" class="submit-btn">ثبت</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Rejection Details Modal (shared) -->
+    <div id="rejection-details-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeRejectionDetailsModal()">&times;</span>
+            <h2 id="rejection-details-title"></h2>
+            <p id="rejection-details-explanation"></p>
+        </div>
+    </div>
+
 
 </body>
 </html>
