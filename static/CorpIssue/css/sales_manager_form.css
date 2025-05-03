@@ -553,12 +553,12 @@ submit-btn:hover {
 .content-wrapper.returned-to-pm-view .next-stage-container {
     display: none !important;
 }
-.content-wrapper.returned-to-pm-view table thead tr th:nth-child(4),
+/*.content-wrapper.returned-to-pm-view table thead tr th:nth-child(4),
 .content-wrapper.returned-to-pm-view table tbody tr td:nth-child(4),
 .content-wrapper.returned-to-pm-view table thead tr th:nth-child(5),
 .content-wrapper.returned-to-pm-view table tbody tr td:nth-child(5) {
     display: none !important;
-}
+}*/
 
 /* Make the table wrapper a positioning context */
 .table-wrapper-relative {

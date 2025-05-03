@@ -1196,11 +1196,16 @@ def sales_manager_view(request, invoice_id):
             'InvoiceTaskStatus_ApprovedBySalesManager'
         ]
         # Add tasks whose status parent is InvoiceTaskStatus_RejectedByCustomer_NotDone
-        rejected_notdone_parent = ConstValue.objects.get(code='InvoiceTaskStatus_RejectedByCustomer_NotDone')
+        rejected_notdone_parent = ConstValue.objects.get(code='InvoiceTaskStatus_RejectedByCustomer')
         invoice_tasks = InvoiceTask.objects.filter(
             Q(invoice=invoice, status__code__in=allowed_statuses) |
             Q(invoice=invoice, status__parent_code=rejected_notdone_parent)
-        ).select_related('task', 'status')
+        ).select_related(
+            'task',
+            'task__project',
+            'task__project__team_code',
+            'status'
+        )
 
         # Get rejection reasons for sales manager
         rejection_parent = ConstValue.objects.get(code='InvoiceTaskStatus_RejectedByCustomer')
@@ -1218,6 +1223,7 @@ def sales_manager_view(request, invoice_id):
                 'task_type': t.task.task_kind.value,
                 'project': t.task.project.project_name,
                 'team': t.task.project.team_code.team_code,
+                'team_name': t.task.project.team_code.team_name,
                 'real_work_hours': t.task.real_work_hours_display,
                 'invoice_work_hours': t.invoice_work_hours_display,
                 'status': t.status.value,
