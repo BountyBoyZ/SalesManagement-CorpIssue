@@ -109,7 +109,12 @@ function showRejectionDetails(taskId) {
         type: 'GET',
         success: function(data) {
             if (data.success) {
-                $('#rejection-details-title').text(data.rejection_title);
+                let title = data.rejection_title;
+                // If the title is "Approved By Project Manager" (English or Persian), show Persian
+                if (title === 'Approved by Project Manager' || title === 'تایید شده توسط مدیر پروژه') {
+                    title = 'تایید شده توسط مدیر پروژه';
+                }
+                $('#rejection-details-title').text(title);
                 $('#rejection-details-explanation').text(data.rejection_explanation);
                 $('#rejection-details-modal').css('display', 'block');
             } else {
@@ -556,6 +561,22 @@ function initializeProjectIcons() {
         });
     });
 }
+
+function filterProjectsByTeams() {
+    const selectedTeams = Array.from(document.querySelectorAll('.team-checkbox:checked')).map(cb => cb.value);
+    document.querySelectorAll('.project-item').forEach(item => {
+        const teamCode = item.className.match(/team-([^\s]+)/)[1];
+        item.style.display = selectedTeams.includes(teamCode) ? 'block' : 'none';
+    });
+}
+
+// On page load and on team checkbox change:
+document.addEventListener('DOMContentLoaded', function() {
+    filterProjectsByTeams();
+    document.querySelectorAll('.team-checkbox').forEach(cb => {
+        cb.addEventListener('change', filterProjectsByTeams);
+    });
+});
 
 function updateProjects() {
     const teamCheckboxes = document.querySelectorAll('.team-checkbox');
@@ -1022,7 +1043,7 @@ function updateProjects() {
                             item.classList.remove('selected');
                             icon.classList.add('grey');
                         }
-                        document.querySelector('.filter-panel form').submit();
+                        //document.querySelector('.filter-panel form').submit();
                     });
 
                     // Handle hover
@@ -1307,7 +1328,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             updateProjects(); // Show projects instantly
             // Instantly submit the filter form to reload the page
-            document.querySelector('.filter-panel form').submit();
+            //document.querySelector('.filter-panel form').submit();
         });
     });
 
@@ -1330,7 +1351,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 item.classList.remove('selected');
                 icon.classList.add('grey');
             }
-            document.querySelector('.filter-panel form').submit();
+            //document.querySelector('.filter-panel form').submit();
         });
     });
 
@@ -1353,7 +1374,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 item.classList.remove('selected');
                 icon.classList.add('grey');
             }
-            document.querySelector('.filter-panel form').submit();
+            //document.querySelector('.filter-panel form').submit();
         });
     });
 });

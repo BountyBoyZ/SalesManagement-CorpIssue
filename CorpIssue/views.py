@@ -26,6 +26,7 @@ from datetime import datetime
 import logging
 import json
 import os
+import openpyxl
 
 
 logger = logging.getLogger(__name__)
@@ -33,7 +34,6 @@ logger = logging.getLogger(__name__)
 @csrf_exempt
 @permission_control
 def list_corps(request, corp_code=None):
-    """Show all corps and display selected corp's status."""
     # Check if user is sales manager
     token = find_token(request)
     user_nationalcode = get_token_data(token, "user_NationalCode")
@@ -557,6 +557,8 @@ def invoice_tasks(request, invoice_id):
 
     success_message = request.GET.get('success_message', '')
 
+    all_projects = Project.objects.select_related('team_code').all()
+
     return render(request, "CorpIssue/InvoiceTask_form.html", {
         'tasks_data': tasks_data,
         'is_product_assistant': is_product_assistant,
@@ -578,7 +580,8 @@ def invoice_tasks(request, invoice_id):
         'query_string': get_query_string(request, page_obj.number),
         'help_doc': 'CorpIssue/Help Docs/Help 2.pdf',
         'success_message': success_message,
-        'show_table': show_table
+        'show_table': show_table,
+        'all_projects': list(all_projects)
     })
 
 
@@ -716,6 +719,17 @@ def approve_task(request, task_id):
             invoice_task.status = approved_status
             invoice_task.save()
 
+            # Always create a new RejectionDetails for نظر فناوران
+            response_text = data.get('response', '')
+            if response_text:
+                RejectionDetails.objects.create(
+                    const_value=approved_status,
+                    invoice_task=invoice_task,
+                    explanation=response_text,
+                    rejected_by=user_nationalcode,
+                    created_by=user_nationalcode
+                )
+
             sales_manager = ConstValue.objects.get(code='StaticRoles_SalesManager')
             if sales_manager and sales_manager.value:
                 send_document(
@@ -796,7 +810,7 @@ def reject_task(request, task_id):
 @csrf_exempt
 @permission_control
 def rejection_details(request, task_id):
-    """Fetch rejection details for the given task ID."""
+    """Fetch latest rejection details for the given task ID."""
     try:
         token = find_token(request)
         user_nationalcode = get_token_data(token, "user_NationalCode")
@@ -1045,6 +1059,17 @@ def sales_manager_view(request, invoice_id):
                 insurance_comments = insurance_comments + [''] * (max_n - max_length + 1)  # +1 for N+1
                 dev_responses = dev_responses + [''] * (max_n - max_length + 1)
 
+                # Find the first rejection detail for this task with const_value code 'InvoiceTaskStatus_RejectedByCustomer'
+                # OR whose parent_code is 'InvoiceTaskStatus_RejectedByCustomer'
+                rejected_by_customer_const = ConstValue.objects.get(code='InvoiceTaskStatus_RejectedByCustomer')
+                initial_rejection_detail = RejectionDetails.objects.filter(
+                    invoice_task=invoice_task
+                ).filter(
+                    Q(const_value__code='InvoiceTaskStatus_RejectedByCustomer') |
+                    Q(const_value__parent_code=rejected_by_customer_const)
+                ).order_by('created_at').first()
+                initial_rejection_title = initial_rejection_detail.const_value.value if initial_rejection_detail else ''
+
                 task_data = {
                     'ردیف': idx,
                     'شناسه تسک': task.task_id,
@@ -1055,6 +1080,7 @@ def sales_manager_view(request, invoice_id):
                     'کارکرد واقعی': task.real_work_hours_display,
                     'کارکرد اعلامی': invoice_task.invoice_work_hours_display,
                     'وضعیت': invoice_task.status.value,
+                    'دلیل عدم تایید': initial_rejection_title, 
                     'نظر شرکت بیمه': insurance_comments[0] if insurance_comments else '',
                     'پاسخ فناوران': dev_responses[0] if dev_responses else ''
                 }
@@ -1068,7 +1094,19 @@ def sales_manager_view(request, invoice_id):
 
             df = pd.DataFrame(tasks_data)
             excel_file = BytesIO()
-            df.to_excel(excel_file, index=False, engine='openpyxl')
+            with pd.ExcelWriter(excel_file, engine='openpyxl') as writer:
+                df.to_excel(writer, index=False, sheet_name='صورت حساب')
+                # Load the Release_Comment.xlsx and append as second sheet
+                release_comment_path = os.path.join(
+                    settings.BASE_DIR, "static", "CorpIssue", "Help Docs", "Release_Comment.xlsx"
+                )
+                if os.path.exists(release_comment_path):
+                    release_wb = openpyxl.load_workbook(release_comment_path)
+                    release_ws = release_wb.active
+                    # Create a new worksheet in the current writer
+                    ws = writer.book.create_sheet(title='راهنمای انتشار')
+                    for row in release_ws.iter_rows(values_only=True):
+                        ws.append(row)
             excel_file.seek(0)
 
             response = HttpResponse(
@@ -1151,16 +1189,17 @@ def sales_manager_view(request, invoice_id):
                 return JsonResponse({'success': False, 'error': str(e)})
 
     if invoice.status.code == 'InvoiceStatus_ReturnedToProjectManager':
-        # Only show relevant tasks
         allowed_statuses = [
             'InvoiceTaskStatus_RejectedByCustomer',
             'InvoiceTaskStatus_ApprovedByProjectManager',
             'InvoiceTaskStatus_RejectedBySalesManager',
             'InvoiceTaskStatus_ApprovedBySalesManager'
         ]
+        # Add tasks whose status parent is InvoiceTaskStatus_RejectedByCustomer_NotDone
+        rejected_notdone_parent = ConstValue.objects.get(code='InvoiceTaskStatus_RejectedByCustomer_NotDone')
         invoice_tasks = InvoiceTask.objects.filter(
-            invoice=invoice,
-            status__code__in=allowed_statuses
+            Q(invoice=invoice, status__code__in=allowed_statuses) |
+            Q(invoice=invoice, status__parent_code=rejected_notdone_parent)
         ).select_related('task', 'status')
 
         # Get rejection reasons for sales manager
