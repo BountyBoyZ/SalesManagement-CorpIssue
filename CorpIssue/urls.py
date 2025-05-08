@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import list_corps, select_version, invoice_tasks, approve_task, reject_task,rejection_details,sub_tasks,approve_all_tasks,sales_manager_view,next_stage,get_team_projects
+from .views import list_corps, select_version, invoice_tasks, approve_task, reject_task,rejection_details,sub_tasks,approve_all_tasks,sales_manager_view,next_stage,get_team_projects,approve_task_sales_manager,reject_task_sales_manager,next_stage_sales_manager,approve_all_and_send
 
 urlpatterns = [
     path('corps/', list_corps, name='list_corps'),  # List all corps
@@ -14,4 +14,8 @@ urlpatterns = [
     path('approve_all_tasks/<int:invoice_id>/', approve_all_tasks, name='approve_all_tasks'),  # Approve all tasks
     path('sales_manager/<int:invoice_id>/', sales_manager_view, name='sales_manager_view'),
     path('sales_manager/<int:invoice_id>/next_stage/', next_stage, name='next_stage'),
+    path('approve_task_sales_manager/<int:task_id>/', approve_task_sales_manager, name='approve_task_sales_manager'),
+    path('reject_task_sales_manager/<int:task_id>/', reject_task_sales_manager, name='reject_task_sales_manager'),
+    path('next_stage_sales_manager/<int:invoice_id>/', next_stage_sales_manager, name='next_stage_sales_manager'),
+    path('approve_all_and_send/<int:invoice_id>/', approve_all_and_send, name='approve_all_and_send'),
 ]

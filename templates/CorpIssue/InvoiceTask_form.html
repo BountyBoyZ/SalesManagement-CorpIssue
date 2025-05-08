@@ -286,26 +286,24 @@
                             <!-- Fourth Column: پروژه (Square grid, bigger icons) -->
                             <div class="filter-column project-column">
                                 <label>پروژه</label>
-                                <div class="multi-select-container project-square">
-                                    {% for project in team_projects %}
-                                    
-                                    <div class="multi-select-item {% if project.id|stringformat:'s' in selected_projects %}selected{% endif %}">
-                                        <input type="checkbox"
-                                               id="project_{{ project.id }}"
-                                               name="project"
-                                               value="{{ project.id }}"
-                                               class="project-checkbox"
-                                               data-team-code="{{ project.team_code }}"
-                                               {% if project.id|stringformat:'s' in selected_projects %}checked{% endif %}>
-                                        <img src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/' %}{{ project.team_code }}{% if project.id|stringformat:'s' in selected_projects %}.png{% else %}-grey.png{% endif %}"
-                                             alt="{{ project.project_name }}"
-                                             class="project-icon big {% if project.id|stringformat:'s' not in selected_projects %}grey{% endif %}"
-                                             data-hover="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/' %}{{ project.team_code }}-hover.png"
-                                             data-selected="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/' %}{{ project.team_code }}.png"
-                                             title="{{ project.project_name }}">
-                                        <span class="project-name">{{ project.project_name }}</span>
-                                    </div>
-                                    
+                                <div class="multi-select-container project-square" id="project-container">
+                                    {% for project in all_projects %}
+                                        <div class="multi-select-item project-item team-{{ project.team_code.team_code }}{% if project.id|stringformat:'s' in selected_projects %} selected{% endif %}" style="display: none;">
+                                            <input type="checkbox"
+                                                   id="project_{{ project.id }}"
+                                                   name="project"
+                                                   value="{{ project.id }}"
+                                                   class="project-checkbox"
+                                                   data-team-code="{{ project.team_code.team_code }}"
+                                                   {% if project.id|stringformat:'s' in selected_projects %}checked{% endif %}>
+                                            <img src="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/' %}{{ project.team_code.team_code }}{% if project.id|stringformat:'s' in selected_projects %}.png{% else %}-grey.png{% endif %}"
+                                                 alt="{{ project.project_name }}"
+                                                 class="project-icon big {% if project.id|stringformat:'s' not in selected_projects %}grey{% endif %}"
+                                                 data-hover="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/' %}{{ project.team_code.team_code }}-hover.png"
+                                                 data-selected="{% static 'CorpIssue/images/InvoiceTaskForm Icons/icons V/' %}{{ project.team_code.team_code }}.png"
+                                                 title="{{ project.project_name }}">
+                                            <span class="project-name">{{ project.project_name }}</span>
+                                        </div>
                                     {% endfor %}
                                 </div>
                             </div>
@@ -324,6 +322,12 @@
                         <button class="approve-all-btn" onclick="approveAllTasks('{{ invoice.id }}')">تایید تمامی تسک ها</button>
                     </div>
                 {% endif %}
+                <div class="table-record-count" style="margin-bottom: 10px; font-family: Vazirmatn-Bold, Vazirmatn, sans-serif;">
+                    نمایش {{ page_obj.start_index }} تا {{ page_obj.end_index }} از {{ page_obj.paginator.count }} رکورد
+                    {% if request.GET %}
+                        (نتیجه جستجو)
+                    {% endif %}
+                </div>
                 <table>
                     <thead>
                         <tr>
