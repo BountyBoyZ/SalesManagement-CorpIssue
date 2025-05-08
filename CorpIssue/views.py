@@ -129,7 +129,6 @@ def select_version(request, corp_code):
         corp = Corp.objects.get(corp_code=corp_code)
     except Corp.DoesNotExist:
         return render(request, "CorpIssue/error.html", {"error": "شرکت مورد نظر یافت نشد."})
-
     if request.method == 'POST':
         selected_version_number = request.POST.get('selected_version')
         selected_version = get_object_or_404(Version, version_number=selected_version_number)
