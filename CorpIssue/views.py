@@ -236,9 +236,11 @@ def invoice_tasks(request, invoice_id):
 
     # Assign default status to tasks without status
     pending_status = ConstValue.objects.get(code='InvoiceTaskStatus_PendingByProductAssistant')
-    for task in InvoiceTask.objects.filter(invoice=invoice, status__isnull=True):
-        task.status = pending_status
-        task.save()
+    InvoiceTask.objects.filter(
+        invoice=invoice
+    ).filter(
+        Q(status__isnull=True) | Q(status__code='InvoiceTaskStatus_Created')
+    ).update(status=pending_status)
 
     # Fetch invoice tasks based on user role
     if user_team.team_code == 'POD':
